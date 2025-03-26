@@ -1,0 +1,23 @@
+:root {
+    /* Primary colors */
+    --sage-black: #1A1A1A;
+    --sage-white: #F5F5F5;
+    --sage-gold: #D4AF37;
+    
+    /* Secondary colors */
+    --sage-blush: #F4D2D2;
+    --sage-lavender: #B19CD9;
+    --sage-peach: #FFDAB9;
+    
+    /* Accent colors */
+    --sage-coral: #FF6F61;
+    --sage-teal: #40E0D0;
+    
+    /* Semantic variables */
+    --primary-bg: var(--sage-white);
+    --primary-text: var(--sage-black);
+    --primary-accent: var(--sage-gold);
+    --button-primary: var(--sage-coral);
+    --button-secondary: var(--sage-teal);
+    --link-hover: var(--sage-blush);
+  }

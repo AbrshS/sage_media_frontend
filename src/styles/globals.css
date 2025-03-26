@@ -1,0 +1,197 @@
+/* Add these imports at the top of your file if they're not already there */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Primary colors */
+  --sage-black: #1A1A1A;
+  --sage-white: #F5F5F5;
+  --sage-gold: #FFD700;
+  
+  /* Secondary colors */
+  --sage-blush: #F4D2D2;
+  --sage-lavender: #B19CD9;
+  --sage-peach: #FFDAB9;
+  
+  /* Accent colors */
+  --sage-coral: #FF6F61;
+  --sage-teal: #40E0D0;
+  
+  /* UI colors (matching Cardo) */
+  --card-bg: #FFFFFF;
+  --dark-blue: #0F172A;
+  --medium-blue: #0A2540;
+  --text-gray: #64748B;
+  --text-dark: #334155;
+  --border-light: #E2E8F0;
+  
+  /* Semantic variables */
+  --primary-bg: var(--sage-black);
+  --primary-text: var(--dark-blue);
+  --primary-accent: var(--sage-gold);
+  --button-primary: var(--sage-gold);
+  --button-secondary: var(--medium-blue);
+  --link-hover: var(--sage-gold);
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--primary-bg);
+  color: var(--primary-text);
+}
+
+html {
+  font-family: 'Inter', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Clash Display', sans-serif;
+}
+/* Card styling */
+/* Card Base Styles */
+.card {
+  background-color: var(--card-bg);
+  border-radius: 24px;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(178, 156, 217, 0.1);
+}
+
+/* Modern Card Variations */
+.card-glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(244, 210, 210, 0.2);
+}
+
+.card-gradient {
+  background: linear-gradient(
+    135deg,
+    var(--sage-blush) 0%,
+    var(--sage-lavender) 50%,
+    var(--sage-teal) 100%
+  );
+  background-size: 200% 200%;
+  animation: gradientShift 8s ease infinite;
+}
+
+.card-hover {
+  transform: translateY(0);
+  box-shadow: 0 4px 20px -8px rgba(10, 37, 64, 0.1);
+}
+
+.card-hover:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px -12px rgba(10, 37, 64, 0.15);
+}
+
+/* Card Content Layouts */
+.card-content {
+  padding: 1.5rem;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.card-footer {
+  border-top: 1px solid var(--border-light);
+  padding-top: 1rem;
+  margin-top: 1rem;
+}
+
+/* Card Media */
+.card-media {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 16/9;
+}
+
+.card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease;
+}
+
+.card-hover:hover .card-media img {
+  transform: scale(1.05);
+}
+
+/* Card Animations */
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Card Badge */
+.card-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  background: var(--sage-gold);
+  color: var(--medium-blue);
+  font-weight: 600;
+  font-size: 0.875rem;
+  z-index: 10;
+}
+
+/* Card Stats */
+.card-stats {
+  display: flex;
+  gap: 1rem;
+  padding: 0.75rem;
+  background: rgba(244, 210, 210, 0.1);
+  border-radius: 12px;
+  margin-top: 1rem;
+}
+
+.card-stat {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--medium-blue);
+  font-weight: 500;
+}
+
+/* Glass effect */
+.glass {
+  background: rgba(10, 37, 64, 0.8);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Button styling */
+.btn-primary {
+  background-color: var(--button-primary);
+  color: var(--dark-blue);
+  font-weight: 500;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-secondary {
+  background-color: var(--button-secondary);
+  color: white;
+  font-weight: 500;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
