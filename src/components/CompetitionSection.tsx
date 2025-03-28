@@ -924,7 +924,7 @@ setIsAuthenticated(() => false);
           onClose={closeAuthModal}
           mode={authMode}
 
-          onSuccess={handleAuthSuccess} setMode={function (mode: "login" | "signup"): void {
+          onSuccess={handleAuthSuccess} setMode={function (): void {
             throw new Error("Function not implemented.")
           } }        />
       )}
