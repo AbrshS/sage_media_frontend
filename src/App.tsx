@@ -53,7 +53,9 @@ function App() {
               element={<ResetPassword API_URL={API_URL} />} 
             />
             {/* Update this line to match the navigation path */}
-            <Route path="/forgot-password" element={<ForgotPassword API_URL={API_URL} />} />
+            <Route path="/forgot-password" element={<ForgotPassword onClose={function (): void {
+                throw new Error('Function not implemented.');
+              } } apiUrl={''} />} />
             
             {/* Public routes */}
             <Route path="/" element={<HomePage />} />

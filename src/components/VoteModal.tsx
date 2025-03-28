@@ -60,7 +60,7 @@ export default function VoteModal({ isOpen, onClose, contestant, onVoteSuccess }
 
     setIsLoading(true);
     try {
-      const response = await axios.post('http://localhost:3000/api/votes', {
+      await axios.post('http://localhost:3000/api/votes', {
         applicationId: contestant._id,
         voteAmount: selectedAmount
       });

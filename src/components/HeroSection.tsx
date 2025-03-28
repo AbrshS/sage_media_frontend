@@ -4,7 +4,7 @@ import { motion, useMotionValue, useSpring } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 
 export default function HeroSection() {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [ ,setMousePosition] = useState({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
   
   // Spring animation for smoother cursor tracking
@@ -19,7 +19,7 @@ export default function HeroSection() {
         const rect = containerRef.current.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
-        setMousePosition({ x, y });
+setMousePosition({ x, y });
         cursorX.set(x);
         cursorY.set(y);
       }

@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Users, Target, Award, Sparkles, ArrowRight, ChevronRight } from 'lucide-react';
+import { Users, Target, Award, Sparkles,  ChevronRight } from 'lucide-react';
 
 export default function About() {
   return (

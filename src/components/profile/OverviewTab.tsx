@@ -9,11 +9,10 @@ interface OverviewTabProps {
 }
 
 const OverviewTab: React.FC<OverviewTabProps> = ({ 
-  profile, 
+
   analytics, 
   activities, 
-  loading,
-  isModelProfile 
+  loading
 }) => {
   // Add pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -204,7 +203,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
           </div>
           
           <div className="space-y-4">
-            {recentActivities.map((activity, index) => (
+            {recentActivities.map((activity: { icon: string; text: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; timestamp: string; metadata: { email: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; }; image: any; }, index: React.Key | null | undefined) => (
               <div key={index} className="flex items-start">
                 <div className={`p-2 rounded-full mr-3 ${
                   activity.icon === 'Heart' ? 'bg-red-100 text-red-600' : 

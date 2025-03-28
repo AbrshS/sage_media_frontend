@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Crown, Trophy, ChevronUp, Heart, Sparkles, Medal, ArrowLeft, Users, Star, Award } from 'lucide-react';
+import { Crown, Trophy, ChevronUp, Heart,  Medal, ArrowLeft, Users,  Award } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useNavigate } from 'react-router-dom';
 import Loading from '@/components/common/Loading';
 import { cn } from '@/lib/utils';
 import { toast } from 'react-hot-toast';
 import VoteModal from '@/components/VoteModal';
-import axios, { AxiosError } from 'axios';
+import axios  from 'axios';
 
 // Update the Contestant interface to match the API response
 interface Contestant {
@@ -176,7 +176,7 @@ export default function Leaderboard() {
               className="md:w-1/2 relative"
             >
               <div className="grid grid-cols-3 gap-2 md:gap-3">
-                {topPerformers.slice(0, 3).map((contestant, idx) => (
+                {topPerformers.slice(0, 3).map((contestant) => (
                   <div key={contestant._id} className="aspect-[3/4] rounded-lg overflow-hidden shadow-md relative group">
                     <img 
                       src={`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/${contestant.portraitPhoto}`}
@@ -307,7 +307,10 @@ export default function Leaderboard() {
         <VoteModal
           isOpen={isVoteModalOpen}
           onClose={() => setIsVoteModalOpen(false)}
-          contestant={selectedContestant}
+          contestant={{
+            ...selectedContestant,
+            votes: { count: selectedContestant.votes }
+          }}
           onVoteSuccess={handleVoteSuccess}
         />
       )}

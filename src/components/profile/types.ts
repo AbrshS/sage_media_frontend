@@ -1,29 +1,23 @@
 export interface UserProfile {
-  id?: string;
+  id: string;
   fullName: string;
+  email: string;
   profileImage?: string;
-  portraitPhoto?: string;  // Add this field
+  coverImage?: string;
   bio?: string;
   location?: {
-    city?: string;
-    country?: string;
+    country: string;
+    city: string;
   };
-  isVerified?: boolean;
-  votes?: number;
-  competition?: {
-    _id: string;
-    title: string;
-    startDate: string;
-    endDate: string;
+  phoneNumber?: string;
+  socialMedia?: {
+    instagram?: string;
+    twitter?: string;
+    facebook?: string;
+    tiktok?: string;
   };
-  phone?: string;
-  joinDate?: string;
-  skills?: string[];
-  instagram?: string;
-  twitter?: string;
-  facebook?: string;
-  tiktok?: string;
-  isPro?: boolean;
+  isVerified: boolean;
+  createdAt: string;
 }
 
 export interface CompetitionDetail {

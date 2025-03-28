@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { ArrowRight, Check, Users, Award, Camera, Globe, Sparkles } from "lucide-react";
+import { ArrowRight, Check,  Award, Camera, Globe, Sparkles } from "lucide-react";
 
 export default function HowItWorks() {
   const steps = [

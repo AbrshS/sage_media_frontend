@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import  { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Search, Filter, Star, CheckCircle, TrendingUp, MapPin, Instagram, ChevronDown } from 'lucide-react';
@@ -34,8 +34,8 @@ const ModelsPage = () => {
   const [showFilters, setShowFilters] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const [totalModels, setTotalModels] = useState(0);
+  const [hasMore ] = useState(true);
+  const [ ] = useState(0);
   
   const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -53,8 +53,7 @@ const ModelsPage = () => {
             setModels(prev => [...prev, ...data.data]);
           }
           
-          setTotalModels(data.totalCount || 0);
-          setHasMore(data.currentPage < data.totalPages);
+       
         }
       } catch (error) {
         console.error('Error fetching models:', error);

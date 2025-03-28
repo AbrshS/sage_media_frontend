@@ -2,11 +2,16 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
-import Header from '../Header';
+
 
 const API_URL = 'http://localhost:3000/api';
 
-const ForgotPassword: React.FC = () => {
+interface ForgotPasswordProps {
+  onClose: () => void;
+  apiUrl: string;
+}
+
+const ForgotPassword: React.FC<ForgotPasswordProps> = ({ }) => {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);

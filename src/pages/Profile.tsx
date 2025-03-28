@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -10,7 +10,7 @@ const Profile = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
+  const [analytics ] = useState<AnalyticsData | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -41,9 +41,10 @@ const Profile = () => {
               bio: modelData.bio || '',
               location: modelData.location || {},
               isVerified: modelData.isVerified,
-              votes: modelData.votes,
-              competition: modelData.competition,
-              // Add other fields as needed
+              // Remove votes and competition as they're not in UserProfile type
+              email: modelData.email || '', // Add required fields from UserProfile
+              socialMedia: modelData.socialMedia || {},
+              createdAt: modelData.createdAt
             });
           }
         } else {
@@ -111,9 +112,8 @@ const Profile = () => {
           {id ? `${profile.fullName}'s Profile` : 'My Profile'}
         </h1>
         <OverviewTab 
-          profile={profile} 
-          analytics={analytics || defaultAnalytics} 
-        />
+          profile={profile}
+          analytics={analytics || defaultAnalytics} activities={undefined} loading={false} isModelProfile={false}        />
       </div>
     </div>
   );

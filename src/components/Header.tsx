@@ -15,7 +15,7 @@ export default function Header() {
   const [modelUser, setModelUser] = useState<null | {id: string, name: string, profileImage?: string}>(null);
   const [loading, setLoading] = useState(true);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [activeSection, setActiveSection] = useState("");
+  const [, setActiveSection] = useState<string>("");
   const headerRef = useRef<HTMLElement>(null);
   
   const navigate = useNavigate();
@@ -66,7 +66,7 @@ export default function Header() {
         const sectionTop = (section as HTMLElement).offsetTop - 100;
         const sectionHeight = (section as HTMLElement).offsetHeight;
         if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
-          setActiveSection(section.id);
+          setActiveSection(section.id);  // section.id is already a string, no need for type assertion
         }
       });
     };

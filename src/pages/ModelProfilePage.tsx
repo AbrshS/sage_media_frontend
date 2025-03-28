@@ -1,5 +1,5 @@
 import Header from '@/components/Header';
-import React, { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom'; // Add useParams
 import OverviewTab from '@/components/profile/OverviewTab';
 import PortfolioTab from '@/components/profile/PortfolioTab';
@@ -17,134 +17,83 @@ const ModelProfilePage = () => {
   const { id } = useParams(); // Get the model ID from URL params
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
-  const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activities, setActivities] = useState(null);
   const [activitiesLoading, setActivitiesLoading] = useState(true);
-  const [userProfile, setUserProfile] = useState(null);
+  // Add these interfaces at the top of the file
+  interface UserProfile {
+    _id: string;
+    id: string;
+    fullName: string;
+    email: string;
+    profileImage?: string;
+    title?: string;
+    bio?: string;
+    isPro?: boolean;
+    isVerified?: boolean;
+    phoneNumber?: string; // Add this line
+    createdAt?: string;  // Add this if needed
+    location?: {
+      city?: string;
+      country?: string;
+    };
+    socialMedia?: {
+      instagram?: string;
+      twitter?: string;
+      facebook?: string;
+      tiktok?: string;
+    };
+  }
+  
+  interface Analytics {
+    profileViews: number;
+    followers: number;
+    competitions: {
+      total: number;
+      details: Array<any>;
+    };
+    votes: {
+      total: number;
+      byCompetition: Array<any>;
+    };
+    recentActivities?: Array<{  // Add this block
+      type: string;
+      icon: string;
+      text: string;
+      timestamp: string;
+      image: string;
+    }>;
+  }
+  
+  interface Activity {
+    type: string;
+    icon: string;
+    text: string;
+    timestamp: string;
+    image: string;
+  }
+  
+  // Update the state declarations
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [analytics, setAnalytics] = useState<Analytics | null>(null);
+  const [activities, setActivities] = useState<Activity[]>([]);
   const [userLoading, setUserLoading] = useState(true);
-  const [uploadLoading, setUploadLoading] = useState(false);
+  const [uploadLoading] = useState(false);
   const [isImageDialogOpen, setIsImageDialogOpen] = useState(false); // Add this missing state
   const [isOwnProfile, setIsOwnProfile] = useState(!id); // If no ID, it's the user's own profile
   
   // Add reset password state variables here
   const [isResetPasswordOpen, setIsResetPasswordOpen] = useState(false);
-  const [passwordData, setPasswordData] = useState({
+  const [] = useState({
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
   });
-  const [passwordError, setPasswordError] = useState('');
-  const [resetLoading, setResetLoading] = useState(false);
+  const [] = useState('');
+  const [] = useState(false);
   
   // Add this function to handle password reset
-  const handleResetPassword = async (e) => {
-    e.preventDefault();
-    setPasswordError('');
-    
-    // Validate passwords
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setPasswordError('New passwords do not match');
-      return;
-    }
-    
-    if (passwordData.newPassword.length < 6) {
-      setPasswordError('Password must be at least 6 characters long');
-      return;
-    }
-    
-    setResetLoading(true);
-    
-    try {
-      // Get token from localStorage
-      const token = localStorage.getItem('token');
-      if (!token) {
-        toast.error('Authentication required');
-        return;
-      }
-      
-      // Call the API to reset password
-      const response = await fetch('http://localhost:3000/api/public/change-password', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          currentPassword: passwordData.currentPassword,
-          newPassword: passwordData.newPassword
-        })
-      });
-      
-      const data = await response.json();
-      
-      if (data.success) {
-        toast.success('Password updated successfully');
-        setIsResetPasswordOpen(false);
-        // Reset form
-        setPasswordData({
-          currentPassword: '',
-          newPassword: '',
-          confirmPassword: ''
-        });
-      } else {
-        setPasswordError(data.message || 'Failed to update password');
-      }
-    } catch (error) {
-      console.error('Password reset error:', error);
-      setPasswordError('An error occurred. Please try again.');
-    } finally {
-      setResetLoading(false);
-    }
-  };
   
   // Function to handle profile image change (only for own profile)
-  const handleProfileImageChange = async (e) => {
-    if (!isOwnProfile) return; // Only allow for own profile
-    
-    const file = e.target.files?.[0];
-    if (!file) return;
-    
-    setUploadLoading(true);
-    
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        toast.error('Authentication required');
-        return;
-      }
-
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const response = await fetch('http://localhost:3000/api/public/upload-profile', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
-        body: formData
-      });
-
-      const data = await response.json();
-      
-      if (data.success) {
-        // Update user profile with new image
-        setUserProfile(prev => ({
-          ...prev,
-          profileImage: data.data.filename
-        }));
-        
-        toast.success('Profile image updated');
-      } else {
-        throw new Error(data.message || 'Upload failed');
-      }
-    } catch (error) {
-      console.error('Upload error:', error);
-      toast.error('Failed to upload image');
-    } finally {
-      setUploadLoading(false);
-    }
-  };
   
   // Add a new useEffect to fetch user profile
   useEffect(() => {
@@ -251,13 +200,15 @@ const ModelProfilePage = () => {
           
           if (data.success) {
             // Map the API response to our userProfile state
+            // When setting the user profile data
             setUserProfile({
-              _id: data.data.id,
+              _id: data.data._id || data.data.id, // Add this line to handle both _id and id
+              id: data.data.id,
               fullName: data.data.fullName,
               email: data.data.email,
               profileImage: data.data.profileImage,
               bio: data.data.bio,
-              location: data.data.location || {},
+              location: data.data.location || { city: undefined, country: undefined },
               phoneNumber: data.data.phoneNumber,
               socialMedia: data.data.socialMedia || {},
               isVerified: data.data.isVerified,
@@ -536,32 +487,32 @@ const ModelProfilePage = () => {
           profile={userProfile} 
           analytics={analytics} 
           activities={activities}
-          loading={loading || activitiesLoading || userLoading} 
+          loading={loading || activitiesLoading || userLoading}
+          isModelProfile={true}
         />;
-      // In the renderTabContent function, update the PortfolioTab case:
       case 'portfolio':
-      return <PortfolioTab 
-        userId={userProfile?._id || ''} 
-        isOwnProfile={isOwnProfile}
-        loading={userLoading} 
-      />;
+        return <PortfolioTab 
+          userId={userProfile?.id || ''} 
+          isOwnProfile={isOwnProfile}
+          loading={userLoading} 
+        />;
       case 'analysis':
         return <AnalysisTab profile={userProfile} />;
       default:
         return <OverviewTab 
-          profile={userProfile} 
-          analytics={analytics} 
+          profile={userProfile}
+          analytics={analytics}
           activities={activities}
-          loading={loading || activitiesLoading} 
-        />;
+          loading={loading || activitiesLoading} isModelProfile={false}        />;
     }
   };
 
   return (
     <div className="bg-white min-h-screen font-['Poppins',sans-serif]">
       {/* Header/Navigation */}
-      <Header transparent={true} />
-
+  
+      
+      <Header  />
       {/* Profile Section */}
       <div className="relative pt-16"> {/* Added top padding here */}
         {/* Background gradient */}
@@ -799,7 +750,9 @@ const ModelProfilePage = () => {
             
             {/* Use the ForgotPassword component */}
             <div className="bg-white rounded-lg">
-              <ForgotPassword />
+              <ForgotPassword onClose={function (): void {
+                throw new Error('Function not implemented.');
+              } } apiUrl={''} />
             </div>
           </Dialog.Panel>
         </div>

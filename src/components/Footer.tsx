@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Instagram, Twitter, Facebook, Youtube, Mail, ArrowUpRight } from 'lucide-react';
+import { Instagram, Twitter, Facebook, Youtube,  ArrowUpRight } from 'lucide-react';
 import { Button } from './ui/button';
 
 export default function Footer() {

@@ -9,7 +9,7 @@ const SocialMediaBadges: React.FC<SocialMediaProps> = ({ socialMedia }) => {
     <div className="flex space-x-2">
       {socialMedia && Object.keys(socialMedia).length > 0 ? (
         // Display social media links from API if available
-        Object.entries(socialMedia).map(([platform, username], index) => {
+        Object.entries(socialMedia).map(([platform, username], ) => {
           if (!username) return null;
           
           // Determine badge color based on platform

@@ -3,7 +3,7 @@ import { Star, Quote } from 'lucide-react';
 import { useState } from 'react';
 
 export default function Testimonials() {
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [] = useState(0);
 
   const testimonials = [
     {

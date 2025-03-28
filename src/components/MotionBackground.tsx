@@ -8,7 +8,6 @@ export default function MotionBackground() {
   // Transform values based on scroll position
   const verticalDotY = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
   const rightLineOpacity = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0.1, 0.3, 0.3, 0.1]);
-  const leftLineOpacity = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0.1, 0.2, 0.2, 0.1]);
   
   return (
     <div ref={containerRef} className="fixed inset-0 pointer-events-none z-0 overflow-hidden">

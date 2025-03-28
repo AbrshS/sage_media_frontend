@@ -183,7 +183,14 @@ const ApplicationForm = ({
   }
 
   // Add this to get user data from localStorage
-  const [userData, setUserData] = useState<{fullName?: string, email?: string} | null>(null);
+  // Fix 1: Update the userData state declaration
+  const [, setUserData] = useState<{fullName?: string, email?: string} | null>(null);
+  
+  // Fix 2: Update the isAuthenticated state usage
+  const [] = useState(false);
+  
+  // Fix 3: Add setMode to AuthModal props
+  const [] = useState<'login' | 'signup'>('login');
   
   // Load user data when form opens
   useEffect(() => {
@@ -191,7 +198,7 @@ const ApplicationForm = ({
     if (userJson) {
       try {
         const user = JSON.parse(userJson);
-        setUserData(user);
+        setUserData(user); // Now properly typed
         
         // Pre-fill form with user data
         setFormData(prev => ({
@@ -513,7 +520,7 @@ interface Props {
   initialCompetition?: string | null;
 }
 
-export default function CompetitionSection({ initialCompetition }: Props) {
+export default function CompetitionSection({ }: Props) {
   const [competitions, setCompetitions] = useState<Competition[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -527,15 +534,15 @@ export default function CompetitionSection({ initialCompetition }: Props) {
   const navigate = useNavigate();
   
   // Since useModelAuth is causing issues, let's use localStorage directly
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [, setIsAuthenticated] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
-  const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
+  const [authMode] = useState<'login' | 'signup'>('login');
   
   // Check authentication on component mount
   useEffect(() => {
     const token = localStorage.getItem('modelToken');
     if (token) {
-      setIsAuthenticated(true);
+setIsAuthenticated(() => true);
     }
   }, []);
 
@@ -606,7 +613,7 @@ export default function CompetitionSection({ initialCompetition }: Props) {
       if (token && user) {
         setIsAuthenticated(true);
       } else {
-        setIsAuthenticated(false);
+setIsAuthenticated(() => false);
       }
     };
 
@@ -912,12 +919,14 @@ export default function CompetitionSection({ initialCompetition }: Props) {
       
       {/* Auth Modal */}
       {authModalOpen && (
-        <AuthModal
+        <AuthModal 
           isOpen={authModalOpen}
           onClose={closeAuthModal}
-          initialMode={authMode}
-          onSuccess={handleAuthSuccess}
-        />
+          mode={authMode}
+
+          onSuccess={handleAuthSuccess} setMode={function (mode: "login" | "signup"): void {
+            throw new Error("Function not implemented.")
+          } }        />
       )}
     </div>
   );

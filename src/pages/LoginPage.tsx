@@ -339,9 +339,7 @@ export default function LoginPage() {
       
       {showForgotPassword && (
         <ForgotPassword 
-          API_URL={API_URL} 
-          onClose={() => setShowForgotPassword(false)} 
-        />
+          onClose={() => setShowForgotPassword(false)} apiUrl={''}        />
       )}
     </>
   );

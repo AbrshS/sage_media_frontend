@@ -1,10 +1,24 @@
 import React from 'react';
 
+// First, let's define a proper interface for the profile
+interface Profile {
+  fullName?: string;
+  bio?: string;
+  location?: {
+    city: string;
+    country?: string;
+  };
+  socialMedia?: Record<string, string>;
+  experience?: string;
+  achievements?: string[];
+}
+
 interface AboutTabProps {
-  profile: any;
+  profile: Profile;
   isModelProfile: boolean;
 }
 
+// Update the social media section
 const AboutTab: React.FC<AboutTabProps> = ({ profile, isModelProfile }) => {
   return (
     <div className="max-w-4xl mx-auto p-6">

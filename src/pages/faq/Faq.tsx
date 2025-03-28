@@ -1,8 +1,8 @@
-import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Minus, Search, ArrowRight, HelpCircle } from 'lucide-react';
+import { motion,  } from 'framer-motion';
+import { Plus, Minus, Search, HelpCircle } from 'lucide-react';
 import { useState } from 'react';
 import { Input } from "@/components/ui/input";
-import { Shield, Wallet, Image, Laptop } from 'lucide-react';
+import { Shield, Image, Laptop } from 'lucide-react';
 
 export default function FAQ() {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);

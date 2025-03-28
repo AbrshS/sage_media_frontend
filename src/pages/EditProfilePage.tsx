@@ -18,8 +18,26 @@ export default function EditProfilePage() {
   // Form states
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [formData, setFormData] = useState({
+  const [, setProfile] = useState<UserProfile | null>(null);
+  interface FormData {
+    fullName: string;
+    email: string;
+    bio: string;
+    phoneNumber: string;
+    location: {
+      country: string;
+      city: string;
+    };
+    socialMedia: {
+      instagram: string;
+      twitter: string;
+      facebook: string;
+      tiktok: string;
+    };
+  }
+  
+  // Update the formData state
+  const [formData, setFormData] = useState<FormData>({
     fullName: '',
     email: '',
     bio: '',
@@ -133,7 +151,7 @@ export default function EditProfilePage() {
       setFormData(prev => ({
         ...prev,
         [parent]: {
-          ...prev[parent as keyof typeof prev],
+          ...(prev[parent as keyof typeof prev] as Record<string, string>),
           [child]: value
         }
       }));

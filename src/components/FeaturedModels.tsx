@@ -31,7 +31,7 @@ export default function FeaturedModels() {
   const navigate = useNavigate()
   const [contestants, setContestants] = useState<Contestant[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [, setError] = useState<string | null>(null)
   const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(true)
   const [ref, inView] = useInView({ threshold: 0 })
@@ -54,14 +54,22 @@ export default function FeaturedModels() {
         // Filter out duplicates when adding to existing contestants
         setContestants(prev => {
           const existingIds = new Set(prev.map(c => c._id))
-          const filteredNew = newContestants.filter(c => !existingIds.has(c._id))
+          const filteredNew = newContestants.filter((c: Contestant) => !existingIds.has(c._id));
           return [...prev, ...filteredNew]
         })
         
         setHasMore(data.currentPage < data.totalPages)
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An unknown error occurred")
+if (setError) {
+if (typeof setError === 'function') {
+if (err instanceof Error) {
+  setError(err.message);
+} else {
+  setError("An unknown error occurred");
+}
+}
+}
       toast.error("Failed to load contestants")
     } finally {
       setLoading(false)
