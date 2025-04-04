@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
 import HowItWorks from "@/components/Howitworks";
-import CompetitionSection from "@/components/CompetitionSection";
+import CompetitionSection from "@/components/CompetitionSection"; // Make sure this path is correct
 import FeaturedModels from "@/components/FeaturedModels";
 import About from "../about/About";
 import Testimonials from "@/components/sections/Testimonials";
@@ -19,13 +19,13 @@ export default function Home() {
         <Header />
         <HeroSection />
         <HowItWorks />
-        <CompetitionSection />
+        <CompetitionSection /> {/* This should now use the updated component */}
         <FeaturedModels />
         <About />
-        <Testimonials />
+        {/* <Testimonials /> */}
         <FAQ />
         <Contact />
-        <CTA />
+        {/* <CTA /> */}
         <Footer />
       </Suspense>
     </div>

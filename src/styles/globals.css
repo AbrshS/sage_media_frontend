@@ -1,5 +1,6 @@
 /* Add these imports at the top of your file if they're not already there */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
 @import url('https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap');
 
 @tailwind base;
@@ -7,35 +8,38 @@
 @tailwind utilities;
 
 :root {
-  /* Primary colors */
+  /* Primary colors - updated with new color scheme */
+  --color-1: #3a4b3c;
+  --color-2: #4e6a56;
+  --color-3: #6cbc8b;
+  --color-4: #97d8a6;
+  --color-5: #e2f8e5;
+  
+  /* Legacy colors - keeping for backward compatibility */
   --sage-black: #1A1A1A;
   --sage-white: #F5F5F5;
   --sage-gold: #FFD700;
-  
-  /* Secondary colors */
   --sage-blush: #F4D2D2;
   --sage-lavender: #B19CD9;
   --sage-peach: #FFDAB9;
-  
-  /* Accent colors */
   --sage-coral: #FF6F61;
   --sage-teal: #40E0D0;
   
-  /* UI colors (matching Cardo) */
+  /* UI colors (updated to match new scheme) */
   --card-bg: #FFFFFF;
-  --dark-blue: #0F172A;
-  --medium-blue: #0A2540;
-  --text-gray: #64748B;
-  --text-dark: #334155;
-  --border-light: #E2E8F0;
+  --dark-blue: var(--color-1);
+  --medium-blue: var(--color-2);
+  --text-gray: var(--color-2);
+  --text-dark: var(--color-1);
+  --border-light: var(--color-5);
   
   /* Semantic variables */
-  --primary-bg: var(--sage-black);
-  --primary-text: var(--dark-blue);
-  --primary-accent: var(--sage-gold);
-  --button-primary: var(--sage-gold);
-  --button-secondary: var(--medium-blue);
-  --link-hover: var(--sage-gold);
+  --primary-bg: var(--color-5);
+  --primary-text: var(--color-1);
+  --primary-accent: var(--color-3);
+  --button-primary: var(--color-3);
+  --button-secondary: var(--color-2);
+  --link-hover: var(--color-4);
 }
 
 body {

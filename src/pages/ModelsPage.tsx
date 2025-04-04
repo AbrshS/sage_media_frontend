@@ -386,7 +386,7 @@ const ModelCard = ({ model, apiBaseUrl }: { model: Model, apiBaseUrl: string }) 
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <Link to={`/profile/${model._id}`} className="block h-full">
+      
         <div className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 border border-[#344c3d]/5 h-full flex flex-col">
           <div className="relative aspect-[3/4] overflow-hidden">
             {/* Gradient overlay */}
@@ -459,7 +459,7 @@ const ModelCard = ({ model, apiBaseUrl }: { model: Model, apiBaseUrl: string }) 
             </div>
           </div>
         </div>
-      </Link>
+
     </motion.div>
   );
 };

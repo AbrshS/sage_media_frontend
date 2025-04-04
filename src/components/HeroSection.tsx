@@ -1,11 +1,18 @@
-import { Button } from "@/components/ui/button";
-import { ArrowRight, Download, Star, ChevronRight, Sparkles } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
 import { motion, useMotionValue, useSpring } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { ArrowRight, Clock, Ticket, Star, Crown, Sparkles } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function HeroSection() {
-  const [ ,setMousePosition] = useState({ x: 0, y: 0 });
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
+  const [timeLeft, setTimeLeft] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0
+  });
   
   // Spring animation for smoother cursor tracking
   const cursorX = useMotionValue(0);
@@ -13,13 +20,39 @@ export default function HeroSection() {
   const springX = useSpring(cursorX, { damping: 25, stiffness: 100 });
   const springY = useSpring(cursorY, { damping: 25, stiffness: 100 });
 
+  // Countdown timer
+  useEffect(() => {
+    // Set end date to 30 days from now for demo
+    const endDate = new Date();
+    endDate.setDate(endDate.getDate() + 30);
+    
+    const timer = setInterval(() => {
+      const now = new Date();
+      const difference = endDate.getTime() - now.getTime();
+      
+      if (difference <= 0) {
+        clearInterval(timer);
+        return;
+      }
+      
+      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+      
+      setTimeLeft({ days, hours, minutes, seconds });
+    }, 1000);
+    
+    return () => clearInterval(timer);
+  }, []);
+
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (containerRef.current) {
         const rect = containerRef.current.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
-setMousePosition({ x, y });
+        setMousePosition({ x, y });
         cursorX.set(x);
         cursorY.set(y);
       }
@@ -37,11 +70,80 @@ setMousePosition({ x, y });
     };
   }, [cursorX, cursorY]);
 
+  // Calculate progress percentage for countdown
+  const totalDays = 30; // Total campaign days
+  const progressPercentage = ((totalDays - timeLeft.days) / totalDays) * 100;
+
   return (
-    <div ref={containerRef} className="w-full bg-[#f8f5f0] text-[#344c3d] py-16 font-['Inter',sans-serif] overflow-hidden relative">
-      {/* Cursor tracker */}
+    <div 
+      ref={containerRef} 
+      className="w-full min-h-screen relative bg-gradient-to-b from-white to-[#f8f5f0] overflow-hidden"
+    >
+      {/* Background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Elegant accent lines */}
+        <motion.div 
+          className="absolute top-[15%] left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#6cbc8b]/30 to-transparent"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5, duration: 1.5 }}
+        />
+        <motion.div 
+          className="absolute top-[85%] left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#3a4b3c]/20 to-transparent"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.7, duration: 1.5 }}
+        />
+        
+        {/* Decorative circles */}
+        <motion.div 
+          className="absolute -top-[300px] -right-[300px] w-[600px] h-[600px] opacity-5"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.05 }}
+          transition={{ duration: 2 }}
+        >
+          <div className="w-full h-full border-[40px] border-[#3a4b3c] rounded-full" />
+        </motion.div>
+        
+        <motion.div 
+          className="absolute -bottom-[300px] -left-[300px] w-[600px] h-[600px] opacity-5"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.05 }}
+          transition={{ duration: 2 }}
+        >
+          <div className="w-full h-full border-[40px] border-[#6cbc8b] rounded-full" />
+        </motion.div>
+        
+        {/* Subtle sparkle elements */}
+        {[...Array(12)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute"
+            initial={{
+              x: `${Math.random() * 100}%`,
+              y: `${Math.random() * 100}%`,
+              scale: 0,
+              opacity: 0
+            }}
+            animate={{
+              scale: [0, 1, 0],
+              opacity: [0, 0.8, 0]
+            }}
+            transition={{
+              duration: 4,
+              delay: i * 1.5,
+              repeat: Infinity,
+              repeatDelay: Math.random() * 10 + 8
+            }}
+          >
+            <Sparkles className="text-[#6cbc8b]" size={Math.random() * 16 + 8} />
+          </motion.div>
+        ))}
+      </div>
+      
+      {/* Cursor follower */}
       <motion.div 
-        className="pointer-events-none absolute z-0 rounded-full opacity-20 bg-[#344c3d] blur-3xl"
+        className="pointer-events-none absolute z-0 rounded-full opacity-10 bg-[#6cbc8b] blur-3xl"
         style={{
           x: springX,
           y: springY,
@@ -51,362 +153,245 @@ setMousePosition({ x, y });
         }}
       />
       
-      <div className="container mx-auto px-4 relative">
-        {/* Enhanced abstract shapes with animation */}
-        <motion.div 
-          className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-[#344c3d]/20 to-[#4a6b58]/5 rounded-full blur-3xl -mr-48 -mt-48 z-0"
-          animate={{ 
-            scale: [1, 1.05, 1],
-            opacity: [0.3, 0.5, 0.3],
-          }}
-          transition={{ 
-            duration: 8, 
-            repeat: Infinity,
-            repeatType: "reverse" 
-          }}
-        />
-        <motion.div 
-          className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-gradient-to-tr from-[#FFD700]/10 to-[#FFD700]/5 rounded-full blur-3xl -ml-40 -mb-40 z-0"
-          animate={{ 
-            scale: [1, 1.1, 1],
-            opacity: [0.2, 0.3, 0.2],
-          }}
-          transition={{ 
-            duration: 10, 
-            repeat: Infinity,
-            repeatType: "reverse",
-            delay: 1
-          }}
-        />
-        
-        {/* Decorative elements */}
-        <div className="absolute top-1/4 left-1/4 w-1 h-20 bg-gradient-to-b from-[#FFD700] to-transparent opacity-30"></div>
-        <div className="absolute bottom-1/3 right-1/3 w-1 h-16 bg-gradient-to-b from-[#344c3d] to-transparent opacity-30"></div>
-        <div className="absolute top-1/2 right-1/4 w-20 h-1 bg-gradient-to-r from-[#FFD700] to-transparent opacity-30"></div>
-        
-        {/* Main content with enhanced grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
-          {/* Left content with enhanced animations */}
-          <motion.div 
-            className="lg:col-span-5 space-y-6 text-center lg:text-left"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <motion.div 
-              className="inline-flex items-center px-4 py-2 bg-[#344c3d]/10 backdrop-blur-sm rounded-full text-sm mb-4 border border-[#344c3d]/20"
-              whileHover={{ scale: 1.05, backgroundColor: "rgba(52, 76, 61, 0.15)" }}
-              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+      {/* Main content */}
+      <div className="container mx-auto px-4 pt-32 pb-20 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          {/* Left column - Main content */}
+          <div className="max-w-xl">
+            {/* Premium badge */}
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="inline-flex items-center px-4 py-2 rounded-full bg-white/80 backdrop-blur-sm border border-[#6cbc8b]/30 shadow-sm mb-8"
             >
-              <Sparkles className="w-4 h-4 text-[#344c3d] mr-2" />
-              <span>Empowering African Models</span>
-              <ChevronRight className="w-4 h-4 ml-2" />
+              <Crown className="h-4 w-4 text-[#6cbc8b] mr-2" />
+              <span className="text-[#3a4b3c] font-medium">Premium Modeling Competition</span>
             </motion.div>
             
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold leading-[1.1] tracking-tight font-['Clash_Display',sans-serif]">
-              <motion.span 
-                className="block bg-clip-text text-transparent bg-gradient-to-r from-[#344c3d] via-[#344c3d]/90 to-[#344c3d]/80"
-                initial={{ x: -20, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ duration: 0.8, delay: 0.2 }}
-              >
-                Discover
-              </motion.span>
-              <motion.span 
-                className="block mt-2 bg-clip-text text-transparent bg-gradient-to-r from-[#344c3d] via-[#4a6b58] to-[#5d8a6f]"
-                initial={{ x: -20, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ duration: 0.8, delay: 0.4 }}
-              >
-                Exceptional
-              </motion.span>
-              <motion.span 
-                className="block mt-2 bg-clip-text text-transparent bg-gradient-to-r from-[#344c3d] via-[#344c3d]/90 to-[#344c3d]/80"
-                initial={{ x: -20, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ duration: 0.8, delay: 0.6 }}
-              >
-                Talent
-              </motion.span>
-            </h1>
-            
-            <motion.p 
-              className="text-lg text-[#4a6d57] max-w-lg mx-auto lg:mx-0"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 1, delay: 0.8 }}
+            {/* Main headline */}
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="text-5xl md:text-7xl font-extrabold mb-6 tracking-tight leading-tight"
+              style={{ 
+                fontFamily: "'Clash Display', sans-serif",
+                background: "linear-gradient(to right, #3a4b3c, #6cbc8b, #3a4b3c)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundSize: "200% auto",
+                animation: "textShine 3s linear infinite"
+              }}
             >
-              Showcase your unique abilities, compete with the best, and elevate your modeling career to unprecedented heights.
+              Africa's Premier <br />
+              <span>Modeling Competition</span>
+            </motion.h1>
+            
+            {/* Elegant divider */}
+            <motion.div
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ delay: 0.5, duration: 1 }}
+              className="h-[2px] w-32 bg-gradient-to-r from-[#3a4b3c]/20 via-[#6cbc8b] to-[#3a4b3c]/20 mb-8"
+            />
+            
+            {/* Subheadline */}
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+              className="text-xl text-[#4e6a56] mb-10 font-light leading-relaxed"
+            >
+              Showcase your talent, gain international exposure, and win career-changing opportunities with Africa's most prestigious modeling platform
             </motion.p>
             
-            <motion.div 
-              className="flex flex-col sm:flex-row gap-4 pt-6 justify-center lg:justify-start"
+            {/* Stats row */}
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 1 }}
+              transition={{ delay: 0.7 }}
+              className="flex flex-wrap gap-8 mb-10"
             >
-              <Button className="bg-gradient-to-r from-[#344c3d] to-[#4a6b58] hover:from-[#4a6b58] hover:to-[#5d8a6f] text-white rounded-full px-8 py-6 text-lg flex items-center gap-2 shadow-lg shadow-[#344c3d]/20 border border-[#5d8a6f]/30">
-                Get Started
-                <ArrowRight className="w-5 h-5" />
+              {[
+                { value: "1,234+", label: "Models Entered" },
+                { value: "$50,000", label: "Prize Pool" },
+                { value: "35+", label: "Countries" }
+              ].map((stat, index) => (
+                <div key={index} className="text-center">
+                  <div 
+                    className="text-3xl font-bold text-[#3a4b3c] mb-1"
+                    style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                  >
+                    {stat.value}
+                  </div>
+                  <div className="text-sm text-[#4e6a56] uppercase tracking-wider">{stat.label}</div>
+                </div>
+              ))}
+            </motion.div>
+            
+            {/* CTA buttons with luxury styling */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8 }}
+              className="flex flex-col sm:flex-row gap-4 mb-10"
+            >
+              <Button 
+                className="bg-[#3a4b3c] hover:bg-[#4e6a56] text-white text-lg px-8 py-6 rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl hover:shadow-[#6cbc8b]/20"
+                asChild
+              >
+                <Link to="/competitions">
+                  Enter Competition
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
               </Button>
-              
-              <Button variant="outline" className="border-[#344c3d]/20 text-[#344c3d] hover:bg-[#344c3d]/10 rounded-full px-8 py-6 text-lg backdrop-blur-sm">
-                Explore Models
+              <Button 
+                variant="outline" 
+                className="border-2 border-[#4e6a56] text-[#4e6a56] hover:bg-[#4e6a56] hover:text-white text-lg px-8 py-6 rounded-xl transition-all duration-300"
+                asChild
+              >
+                <Link to="/leaderboard">
+                  View Leaderboard
+                </Link>
               </Button>
             </motion.div>
             
-            <motion.div 
-              className="pt-12 grid grid-cols-3 gap-4"
+            {/* Testimonial for social proof */}
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 1.2 }}
+              transition={{ delay: 0.9 }}
+              className="flex items-center bg-white/50 backdrop-blur-sm rounded-xl p-4 border border-[#6cbc8b]/10"
             >
-              <motion.div 
-                className="text-center p-3 rounded-xl backdrop-blur-sm bg-[#344c3d]/5 border border-[#344c3d]/10"
-                whileHover={{ y: -5, backgroundColor: "rgba(52, 76, 61, 0.1)" }}
-              >
-                <p className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-[#344c3d] to-[#344c3d]/70">5000+</p>
-                <p className="text-sm text-[#4a6d57]/80 mt-1">Active models</p>
-              </motion.div>
-              <motion.div 
-                className="text-center p-3 rounded-xl backdrop-blur-sm bg-[#344c3d]/5 border border-[#344c3d]/10"
-                whileHover={{ y: -5, backgroundColor: "rgba(52, 76, 61, 0.1)" }}
-              >
-                <p className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-[#344c3d] to-[#344c3d]/70">30.3k</p>
-                <p className="text-sm text-[#4a6d57]/80 mt-1">Downloads</p>
-              </motion.div>
-              <motion.div 
-                className="text-center p-3 rounded-xl backdrop-blur-sm bg-[#344c3d]/5 border border-[#344c3d]/10"
-                whileHover={{ y: -5, backgroundColor: "rgba(52, 76, 61, 0.1)" }}
-              >
-                <p className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-[#344c3d] to-[#344c3d]/70">1200+</p>
-                <p className="text-sm text-[#4a6d57]/80 mt-1">Competitions</p>
-              </motion.div>
-            </motion.div>
-          </motion.div>
-          
-          {/* Right content - Enhanced 3D model showcase with parallax effect */}
-          <motion.div 
-            className="lg:col-span-7 relative"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 0.2 }}
-          >
-            <div className="relative h-[500px] sm:h-[600px] flex items-center justify-center">
-              {/* Main model image with enhanced styling */}
-              <motion.div
-                className="absolute z-20 transform"
-                initial={{ scale: 0.9, rotateY: -5 }}
-                animate={{ scale: 1, rotateY: 0 }}
-                transition={{ duration: 1, delay: 0.4 }}
-                whileHover={{ scale: 1.02, rotateY: 5 }}
-              >
-                <div className="relative">
-                  <img 
-                    src="hero1.png" 
-                    alt="Featured Model" 
-                    className="h-[450px] sm:h-[550px] object-cover rounded-2xl shadow-2xl"
-                    style={{
-                      boxShadow: "0 25px 50px -12px rgba(52, 76, 61, 0.25), 0 0 0 1px rgba(52, 76, 61, 0.1) inset",
-                    }}
-                  />
-                  
-                  {/* Gradient overlay */}
-                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-t from-[#f8f5f0]/30 via-transparent to-transparent"></div>
-                  
-                  {/* Animated glow effect */}
-                  <motion.div 
-                    className="absolute -inset-0.5 bg-gradient-to-r from-[#344c3d]/0 via-[#FFD700]/20 to-[#344c3d]/0 rounded-2xl blur-xl opacity-30 -z-10"
-                    animate={{ 
-                      backgroundPosition: ['0% 50%', '100% 50%', '0% 50%']
-                    }}
-                    transition={{ 
-                      duration: 5, 
-                      repeat: Infinity,
-                      repeatType: "loop" 
-                    }}
-                  />
-                </div>
-                
-                {/* Enhanced floating badge */}
-                <motion.div 
-                  className="absolute -right-10 top-1/4 bg-[#344c3d]/10 backdrop-blur-md rounded-xl p-4 border border-[#344c3d]/20 shadow-xl"
-                  initial={{ x: 20, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  transition={{ duration: 0.8, delay: 1.4 }}
-                  whileHover={{ scale: 1.05, backgroundColor: "rgba(52, 76, 61, 0.15)" }}
-                >
-                  <div className="text-sm font-medium mb-1 text-[#344c3d]">Top Rated</div>
-                  <div className="flex items-center gap-1">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <motion.div
-                        key={star}
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ delay: 1.4 + star * 0.1 }}
-                      >
-                        <Star fill="#FFD700" className="w-4 h-4 text-[#FFD700]" />
-                      </motion.div>
-                    ))}
+              <div className="flex -space-x-3 mr-4">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="w-10 h-10 rounded-full border-2 border-white overflow-hidden">
+                    <img 
+                      src={`/images/model-${i+1}.jpg`} 
+                      alt="Model" 
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.src = `https://randomuser.me/api/portraits/${i % 2 === 0 ? 'women' : 'men'}/${i+20}.jpg`;
+                      }}
+                    />
                   </div>
-                </motion.div>
-                
-                {/* Enhanced category tag */}
+                ))}
+              </div>
+              <div>
+                <div className="flex items-center mb-1">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-3 w-3 text-[#6cbc8b] fill-[#6cbc8b]" />
+                  ))}
+                </div>
+                <p className="text-sm text-[#4e6a56]">
+                  <span className="font-medium">230+ models</span> joined in the last 24 hours
+                </p>
+              </div>
+            </motion.div>
+          </div>
+          
+          {/* Right column - Countdown and image */}
+          <div>
+            {/* Countdown timer with luxury styling */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1 }}
+              className="bg-white rounded-2xl p-8 shadow-[0_10px_50px_-12px_rgba(108,188,139,0.25)] border border-[#6cbc8b]/10 mb-8 relative z-10"
+            >
+              <div className="flex items-center mb-6">
+                <div className="w-12 h-12 rounded-full bg-[#3a4b3c]/5 flex items-center justify-center mr-4">
+                  <Clock className="text-[#3a4b3c] h-6 w-6" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-[#3a4b3c]">Competition Closes In:</h3>
+                  <p className="text-sm text-[#4e6a56]">Don't miss your opportunity to showcase your talent</p>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-4 gap-4 mb-8">
+                {[
+                  { value: timeLeft.days, label: "Days" },
+                  { value: timeLeft.hours, label: "Hours" },
+                  { value: timeLeft.minutes, label: "Minutes" },
+                  { value: timeLeft.seconds, label: "Seconds" }
+                ].map((item, index) => (
+                  <div key={index} className="text-center">
+                    <div className="bg-[#f7f9f7] rounded-xl p-4 border border-[#6cbc8b]/10">
+                      <div 
+                        className="text-4xl font-bold text-[#3a4b3c] mb-1"
+                        style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                      >
+                        {item.value < 10 ? `0${item.value}` : item.value}
+                      </div>
+                      <div className="text-xs text-[#4e6a56] uppercase tracking-wider">{item.label}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              {/* Progress bar */}
+              <div className="w-full h-1 bg-[#f7f9f7] rounded-full overflow-hidden mb-2">
                 <motion.div 
-                  className="absolute -left-6 bottom-20 bg-gradient-to-r from-[#344c3d] to-[#4a6b58] px-6 py-3 rounded-full shadow-lg border border-[#5d8a6f]/30"
-                  initial={{ x: -20, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  transition={{ duration: 0.8, delay: 1.6 }}
-                  whileHover={{ scale: 1.05, x: -3 }}
-                >
-                  <span className="text-white font-medium">High Fashion</span>
-                </motion.div>
-              </motion.div>
+                  className="h-full bg-gradient-to-r from-[#3a4b3c] to-[#6cbc8b] rounded-full"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${progressPercentage}%` }}
+                  transition={{ duration: 1, delay: 1.2 }}
+                ></motion.div>
+              </div>
+              <div className="flex justify-between text-sm text-[#4e6a56] mb-6">
+                <span>Campaign Started</span>
+                <span>{Math.round(progressPercentage)}% Complete</span>
+              </div>
               
-              {/* Enhanced background models with parallax effect */}
-              <motion.div 
-                className="absolute left-0 bottom-0 z-10 opacity-70"
-                initial={{ x: -100, opacity: 0 }}
-                animate={{ x: 0, opacity: 0.7 }}
-                transition={{ duration: 1.2, delay: 0.6 }}
-                whileHover={{ x: -10, opacity: 0.9 }}
+              {/* Quick apply button */}
+              <Button 
+                className="w-full bg-[#3a4b3c] hover:bg-[#4e6a56] text-white text-lg py-5 rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl hover:shadow-[#6cbc8b]/20"
+                asChild
               >
-                <div className="relative">
-                  <img 
-                    src="mobileapp.png" 
-                    alt="Model App" 
-                    className="h-[300px] object-cover rounded-xl"
-                  />
-                  <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#f8f5f0]/60 via-transparent to-[#f8f5f0]/60"></div>
-                </div>
-              </motion.div>
-              
-              <motion.div 
-                className="absolute right-0 top-10 z-10 opacity-70"
-                initial={{ x: 100, opacity: 0 }}
-                animate={{ x: 0, opacity: 0.7 }}
-                transition={{ duration: 1.2, delay: 0.8 }}
-                whileHover={{ x: 10, opacity: 0.9 }}
-              >
-                <div className="relative">
-                  <img 
-                    src="mobileapp.png" 
-                    alt="Model App" 
-                    className="h-[250px] object-cover rounded-xl"
-                  />
-                  <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#f8f5f0]/60 via-transparent to-[#f8f5f0]/60"></div>
-                </div>
-              </motion.div>
-              
-              {/* Enhanced floating elements with interaction */}
-              <motion.div 
-                className="absolute -bottom-10 right-20 bg-[#344c3d]/10 backdrop-blur-md rounded-full p-4 border border-[#344c3d]/20 shadow-xl"
-                initial={{ y: 50, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 1, delay: 1 }}
-                whileHover={{ y: -5, scale: 1.1, backgroundColor: "rgba(52, 76, 61, 0.2)" }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Download className="w-6 h-6 text-[#344c3d]" />
-              </motion.div>
-              
-              <motion.div 
-                className="absolute top-10 left-1/4 bg-[#344c3d]/10 backdrop-blur-md rounded-full p-3 border border-[#344c3d]/20 shadow-xl"
-                initial={{ y: -50, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 1, delay: 1.2 }}
-                whileHover={{ y: 5, scale: 1.1, backgroundColor: "rgba(52, 76, 61, 0.2)" }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <div className="w-3 h-3 bg-[#FFD700] rounded-full"></div>
-              </motion.div>
-              
-              {/* New decorative elements */}
-              <motion.div 
-                className="absolute top-1/3 right-1/3 bg-[#344c3d]/5 backdrop-blur-sm rounded-full p-2 border border-[#344c3d]/10 shadow-lg"
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: 1, opacity: 0.8 }}
-                transition={{ duration: 0.5, delay: 1.8 }}
-              >
-                <div className="w-2 h-2 bg-[#344c3d] rounded-full"></div>
-              </motion.div>
-              
-              <motion.div 
-                className="absolute bottom-1/4 left-1/3 w-20 h-1 bg-gradient-to-r from-[#FFD700]/50 to-transparent rounded-full"
-                initial={{ scaleX: 0, opacity: 0 }}
-                animate={{ scaleX: 1, opacity: 0.6 }}
-                transition={{ duration: 0.8, delay: 2 }}
+                <Link to="/competitions">
+                  Apply Now
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+              </Button>
+            </motion.div>
+            
+            {/* Featured model image */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 1.2, duration: 0.8 }}
+              className="relative rounded-2xl overflow-hidden shadow-2xl border-4 border-white"
+            >
+              <img 
+                src="/images/featured-model.jpg" 
+                alt="Featured Model" 
+                className="w-full h-[500px] object-cover"
+                onError={(e) => {
+                  e.currentTarget.src = "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80";
+                }}
               />
-            </div>
-          </motion.div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex flex-col justify-end p-6">
+                <div className="inline-flex items-center px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 mb-3 w-fit">
+                  <Crown className="h-3 w-3 text-white mr-1" />
+                  <span className="text-white text-xs font-medium">2023 Winner</span>
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-1">Amara Kente</h3>
+                <p className="text-white/80 text-sm">International Model & Brand Ambassador</p>
+              </div>
+            </motion.div>
+          </div>
         </div>
       </div>
-    
-    
-    {/* Scroll indicator */}
-    <motion.div 
-      className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex flex-col items-center"
-      initial={{ opacity: 0, y: -10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 2.5, duration: 0.8 }}
-    >
-      <p className="text-[#344c3d]/70 text-sm mb-2">Scroll to explore</p>
-      <motion.div 
-        className="w-6 h-10 border-2 border-[#344c3d]/30 rounded-full flex justify-center p-1"
-        animate={{ y: [0, 5, 0] }}
-        transition={{ duration: 1.5, repeat: Infinity }}
-      >
-        <motion.div 
-          className="w-1.5 h-1.5 bg-[#344c3d]/50 rounded-full"
-          animate={{ y: [0, 6, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity }}
-        />
-      </motion.div>
-    </motion.div>
-    
-    
-    {/* Vertical motion line that spans the entire page */}
-    <div className="absolute left-8 top-0 bottom-0 hidden lg:block">
-      <div className="h-full w-px bg-gradient-to-b from-transparent via-[#344c3d]/20 to-transparent relative">
-        <motion.div 
-          className="absolute w-1.5 h-1.5 bg-[#344c3d] rounded-full -left-[2px]"
-          animate={{ 
-            y: [0, '100vh', 0],
-            scale: [1, 1.5, 1]
-          }}
-          transition={{ 
-            duration: 15, 
-            repeat: Infinity,
-            ease: "easeInOut" 
-          }}
-        />
-      </div>
+      
+      {/* Add CSS for text gradient animation */}
+      <style>{`
+        @keyframes textShine {
+          0% { background-position: 0% center; }
+          100% { background-position: 200% center; }
+        }
+      `}</style>
     </div>
-    
-    {/* Floating elements that appear throughout the page */}
-    <div className="absolute inset-0 pointer-events-none overflow-hidden">
-      {[...Array(8)].map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute w-2 h-2 rounded-full bg-[#344c3d]/10"
-          style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-          }}
-          animate={{
-            y: [0, -100, 0],
-            opacity: [0, 0.8, 0],
-            scale: [0, 1.5, 0]
-          }}
-          transition={{
-            duration: 10 + Math.random() * 10,
-            repeat: Infinity,
-            delay: i * 2,
-            ease: "easeInOut"
-          }}
-        />
-      ))}
-    </div>
-  </div>
   );
 }

@@ -1,25 +1,25 @@
 "use client"
 
-import type React from "react"
-
 import { useEffect, useState, useCallback, useRef } from "react"
-import { motion } from "framer-motion"
-import { AlertCircle, Calendar, Clock, Award, ArrowRight, Sparkles, TrendingUp, Users, Globe } from "lucide-react"
-import axios from "axios"
+import { motion, AnimatePresence } from "framer-motion"
+import { AlertCircle, Calendar, Clock, Award, ArrowRight, Sparkles, TrendingUp, Users, DollarSign, Search, Filter, ChevronDown, X } from "lucide-react"
+import { format } from 'date-fns'
 import { toast } from "react-hot-toast"
-import AuthModal from "./AuthModal"
 import { useNavigate } from "react-router-dom"
+import CompetitionApplicationForm from "./CompetitionApplicationForm"
 
-// Keep existing interfaces and constants
+// Types
 interface Competition {
   _id: string
   title: string
   description: string
   competitionImage: string
+  bannerImage?: string
   startDate: string
   endDate: string
   applicationFee: number
   status: 'upcoming' | 'active' | 'completed'
+  participants: any[]
   daysUntilStart: number
   daysUntilEnd: number
 }
@@ -33,7 +33,12 @@ interface ApiResponse {
   error?: string
 }
 
-// Keep sample data and API constants
+// Constants
+const API_BASE_URL = "http://localhost:3000";
+const RETRY_COUNT = 3;
+const RETRY_DELAY = 1000;
+
+// Sample data for fallback
 const sampleCompetitions = [
   {
     _id: "1",
@@ -53,13 +58,9 @@ const sampleCompetitions = [
     description: "Show your best angles and win amazing prizes in our photogenic competition.",
     image: "/placeholder.svg?height=240&width=360",
   },
-]
+];
 
-const API_BASE_URL = "http://localhost:3000";
-const RETRY_COUNT = 3;
-const RETRY_DELAY = 1000;
-
-// Enhanced error alert with luxury styling
+// Error Alert Component
 const ErrorAlert = ({ message }: { message: string }) => (
   <motion.div 
     initial={{ opacity: 0, y: -10 }}
@@ -69,489 +70,87 @@ const ErrorAlert = ({ message }: { message: string }) => (
     <AlertCircle className="h-5 w-5" />
     <p className="text-sm font-medium">{message}</p>
   </motion.div>
-)
+);
 
-// Keep ApplicationForm component with its existing functionality
-const ApplicationForm = ({
-  isOpen,
-  onClose,
-  competitionId,
-}: {
-  isOpen: boolean
-  onClose: () => void
-  competitionId: string
-}) => {
-  const [formData, setFormData] = useState({
-    fullName: "",
-    age: "",
-    address: "",
-    phoneNumber: "",
-    alternatePhoneNumber: "",
-    email: "",
-    portraitPhoto: null as File | null,
-  })
-  const [formErrors, setFormErrors] = useState<Record<string, string>>({})
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const navigate = useNavigate()
-
-  const validateForm = () => {
-    const errors: Record<string, string> = {}
-    
-    // Name validation - improved to check for proper name format
-    if (!formData.fullName.trim()) {
-      errors.fullName = "Full name is required"
-    } else if (formData.fullName.trim().length < 3) {
-      errors.fullName = "Name must be at least 3 characters"
-    } else if (!/^[a-zA-Z\s'-]+$/.test(formData.fullName.trim())) {
-      errors.fullName = "Name should contain only letters, spaces, hyphens and apostrophes"
-    }
-
-    // Age validation - improved to ensure it's a valid number
-    const age = parseInt(formData.age)
-    if (!formData.age) {
-      errors.age = "Age is required"
-    } else if (isNaN(age) || age < 16 || age > 45) {
-      errors.age = "Age must be between 16 and 45"
-    }
-
-    // Email validation - improved regex
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
-    if (!formData.email) {
-      errors.email = "Email is required"
-    } else if (!emailRegex.test(formData.email)) {
-      errors.email = "Please enter a valid email address"
-    }
-
-    // Phone validation - improved to handle international formats
-    const phoneRegex = /^(\+\d{1,3})?[-.\s]?\(?\d{1,4}\)?[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/
-    if (!formData.phoneNumber) {
-      errors.phoneNumber = "Phone number is required"
-    } else if (!phoneRegex.test(formData.phoneNumber)) {
-      errors.phoneNumber = "Please enter a valid phone number"
-    }
-
-    // Alternate phone validation - only if provided
-    if (formData.alternatePhoneNumber && !phoneRegex.test(formData.alternatePhoneNumber)) {
-      errors.alternatePhoneNumber = "Please enter a valid phone number"
-    }
-
-    // Address validation - improved to check minimum length
-    if (!formData.address.trim()) {
-      errors.address = "Address is required"
-    } else if (formData.address.trim().length < 5) {
-      errors.address = "Please enter a complete address"
-    }
-
-    // Photo validation - improved to check file type and size
-    if (!formData.portraitPhoto) {
-      errors.portraitPhoto = "Portrait photo is required"
-    } else {
-      const file = formData.portraitPhoto
-      const validTypes = ['image/jpeg', 'image/png', 'image/jpg']
-      const maxSize = 5 * 1024 * 1024 // 5MB
-      
-      if (!validTypes.includes(file.type)) {
-        errors.portraitPhoto = "Please upload a JPEG or PNG image"
-      } else if (file.size > maxSize) {
-        errors.portraitPhoto = "Image must be less than 5MB"
-      }
-    }
-
-    setFormErrors(errors)
-    return Object.keys(errors).length === 0
+// Status Badge Helper
+const getStatusStyles = (status: string) => {
+  switch(status) {
+    case 'active':
+      return {
+        bg: 'bg-gradient-to-r from-emerald-500 to-teal-500',
+        text: 'text-white',
+        icon: <TrendingUp className="w-3 h-3 mr-1" />
+      };
+    case 'upcoming':
+      return {
+        bg: 'bg-gradient-to-r from-amber-400 to-yellow-500',
+        text: 'text-white',
+        icon: <Calendar className="w-3 h-3 mr-1" />
+      };
+    default:
+      return {
+        bg: 'bg-gradient-to-r from-gray-400 to-gray-500',
+        text: 'text-white',
+        icon: <Clock className="w-3 h-3 mr-1" />
+      };
   }
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value, type } = e.target
-    if (type === 'file') {
-      const fileInput = e.target as HTMLInputElement
-      setFormData((prev) => ({
-        ...prev,
-        [name]: fileInput.files?.[0] || null,
-      }))
-    } else {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-      }))
-    }
-    // Clear error when user starts typing
-    if (formErrors[name]) {
-      setFormErrors((prev) => ({ ...prev, [name]: "" }))
-    }
-  }
-
-  // Add this to get user data from localStorage
-  // Fix 1: Update the userData state declaration
-  const [, setUserData] = useState<{fullName?: string, email?: string} | null>(null);
-  
-  // Fix 2: Update the isAuthenticated state usage
-  const [] = useState(false);
-  
-  // Fix 3: Add setMode to AuthModal props
-  const [] = useState<'login' | 'signup'>('login');
-  
-  // Load user data when form opens
-  useEffect(() => {
-    const userJson = localStorage.getItem('user');
-    if (userJson) {
-      try {
-        const user = JSON.parse(userJson);
-        setUserData(user); // Now properly typed
-        
-        // Pre-fill form with user data
-        setFormData(prev => ({
-          ...prev,
-          fullName: user.fullName || prev.fullName,
-          email: user.email || prev.email
-        }));
-      } catch (e) {
-        console.error('Error parsing user data:', e);
-      }
-    }
-  }, []);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!validateForm()) {
-      return;
-    }
-    
-    setLoading(true);
-    setError(null);
-    
-    const token = localStorage.getItem('modelToken');
-    if (!token) {
-      setError('You must be logged in to apply');
-      setLoading(false);
-      return;
-    }
-    
-    const formDataToSend = new FormData();
-    // Ensure competitionId is properly added to FormData
-    formDataToSend.append('competition', competitionId); // Changed from 'competitionId' to 'competition'
-    formDataToSend.append('fullName', formData.fullName);
-    formDataToSend.append('age', formData.age);
-    formDataToSend.append('address', formData.address);
-    formDataToSend.append('phoneNumber', formData.phoneNumber);
-    formDataToSend.append('email', formData.email);
-    if (formData.alternatePhoneNumber) {
-      formDataToSend.append('alternatePhoneNumber', formData.alternatePhoneNumber);
-    }
-    if (formData.portraitPhoto) {
-      formDataToSend.append('portraitPhoto', formData.portraitPhoto);
-    }
-
-    try {
-      const response = await axios.post(
-        `${API_BASE_URL}/api/applications`, 
-        formDataToSend,
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        }
-      );
-      
-      if (response.data && response.data.success) {
-        toast.success('Application submitted successfully!');
-        onClose();
-      } else {
-        setError(response.data?.message || 'Failed to submit application');
-      }
-    } catch (error: any) {
-      console.error('Application error:', error);
-      setError(error.response?.data?.message || 'Failed to submit application');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (!isOpen) return null
-
-  // Inside the ApplicationForm component's return statement
-  return (
-    <div className="w-screen fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 transition-all duration-300">
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-[#f5f5f0] border border-[#34c3d]/20 rounded-xl p-8 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl"
-      >
-        <div className="flex justify-between items-center mb-8">
-          <h2 className="text-[#344c3d] text-2xl font-bold">Apply for Competition</h2>
-          <button 
-            onClick={onClose} 
-            className="text-[#344c3d]/70 hover:text-[#344c3d] transition-colors p-2 hover:bg-[#344c3d]/10 rounded-full"
-          >
-            ✕
-          </button>
-        </div>
-
-        {error && (
-          <div className="flex flex-col items-center gap-2 p-4 text-red-700 bg-red-100 border border-red-300 rounded-lg mb-6">
-            <div className="flex items-center gap-2">
-              <AlertCircle className="h-4 w-4" />
-              <p className="text-sm">{error}</p>
-            </div>
-            
-            {(error.includes('logged in') || error.includes('session') || error.includes('sign in')) && (
-              <button
-                onClick={() => navigate('/model/auth', { 
-                  state: { 
-                    returnTo: window.location.pathname,
-                    competitionId 
-                  } 
-                })}
-                className="mt-2 bg-[#344c3d] text-white px-4 py-2 rounded-full text-sm hover:bg-[#344c3d]/90 transition-colors"
-              >
-                Sign in now
-              </button>
-            )}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Personal Information */}
-          <div className="space-y-4">
-            <h3 className="text-[#344c3d] font-semibold">Personal Information</h3>
-            
-            <div className="space-y-2">
-              <label htmlFor="fullName" className="block text-[#344c3d] text-sm">
-                Full Name *
-              </label>
-              <input
-                id="fullName"
-                type="text"
-                name="fullName"
-                placeholder="Enter your full name"
-                className={`w-full px-4 py-3 bg-white border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#344c3d]/50 focus:border-[#344c3d] text-[#344c3d] transition-all duration-200 ${
-                  formErrors.fullName ? 'border-red-500' : 'border-[#344c3d]/20'
-                }`}
-                value={formData.fullName}
-                onChange={handleChange}
-                required
-              />
-              {formErrors.fullName && (
-                <p className="text-red-500 text-xs mt-1">{formErrors.fullName}</p>
-              )}
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label htmlFor="age" className="block text-[#344c3d] text-sm">
-                  Age *
-                </label>
-                <input
-                  id="age"
-                  type="number"
-                  name="age"
-                  min="16"
-                  max="45"
-                  placeholder="Age"
-                  className={`w-full px-4 py-3 bg-white border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#344c3d]/50 focus:border-[#344c3d] text-[#344c3d] transition-all duration-200 ${
-                    formErrors.age ? 'border-red-500' : 'border-[#344c3d]/20'
-                  }`}
-                  value={formData.age}
-                  onChange={handleChange}
-                  required
-                />
-                {formErrors.age && (
-                  <p className="text-red-500 text-xs mt-1">{formErrors.age}</p>
-                )}
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <label htmlFor="address" className="block text-[#344c3d] text-sm">
-                Address *
-              </label>
-              <textarea
-                id="address"
-                name="address"
-                placeholder="Enter your address"
-                className={`w-full px-4 py-3 bg-white border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#344c3d]/50 focus:border-[#344c3d] text-[#344c3d] transition-all duration-200 ${
-                  formErrors.address ? 'border-red-500' : 'border-[#344c3d]/20'
-                }`}
-                value={formData.address}
-                onChange={handleChange}
-                required
-                rows={3}
-              />
-              {formErrors.address && (
-                <p className="text-red-500 text-xs mt-1">{formErrors.address}</p>
-              )}
-            </div>
-          </div>
-
-          {/* Contact Information */}
-          <div className="space-y-4">
-            <h3 className="text-[#344c3d] font-semibold">Contact Information</h3>
-            
-            <div className="space-y-2">
-              <label htmlFor="email" className="block text-[#344c3d] text-sm">
-                Email *
-              </label>
-              <input
-                id="email"
-                type="email"
-                name="email"
-                placeholder="Enter your email"
-                className={`w-full px-4 py-3 bg-white border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#344c3d]/50 focus:border-[#344c3d] text-[#344c3d] transition-all duration-200 ${
-                  formErrors.email ? 'border-red-500' : 'border-[#344c3d]/20'
-                }`}
-                value={formData.email}
-                onChange={handleChange}
-                required
-              />
-              {formErrors.email && (
-                <p className="text-red-500 text-xs mt-1">{formErrors.email}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <label htmlFor="phoneNumber" className="block text-[#344c3d] text-sm">
-                Phone Number *
-              </label>
-              <input
-                id="phoneNumber"
-                type="tel"
-                name="phoneNumber"
-                placeholder="Enter your phone number"
-                className={`w-full px-4 py-3 bg-white border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#344c3d]/50 focus:border-[#344c3d] text-[#344c3d] transition-all duration-200 ${
-                  formErrors.phoneNumber ? 'border-red-500' : 'border-[#344c3d]/20'
-                }`}
-                value={formData.phoneNumber}
-                onChange={handleChange}
-                required
-              />
-              {formErrors.phoneNumber && (
-                <p className="text-red-500 text-xs mt-1">{formErrors.phoneNumber}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <label htmlFor="alternatePhoneNumber" className="block text-[#344c3d] text-sm">
-                Alternate Phone Number
-              </label>
-              <input
-                id="alternatePhoneNumber"
-                type="tel"
-                name="alternatePhoneNumber"
-                placeholder="Enter your alternate phone number"
-                className={`w-full px-4 py-3 bg-white border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#344c3d]/50 focus:border-[#344c3d] text-[#344c3d] transition-all duration-200 ${
-                  formErrors.alternatePhoneNumber ? 'border-red-500' : 'border-[#344c3d]/20'
-                }`}
-                value={formData.alternatePhoneNumber}
-                onChange={handleChange}
-              />
-              {formErrors.alternatePhoneNumber && (
-                <p className="text-red-500 text-xs mt-1">{formErrors.alternatePhoneNumber}</p>
-              )}
-            </div>
-          </div>
-
-          {/* Photos */}
-          <div className="space-y-4">
-            <h3 className="text-[#344c3d] font-semibold">Photos</h3>
-            
-            <div className="space-y-2">
-              <label htmlFor="portraitPhoto" className="block text-[#344c3d] text-sm">
-                Portrait Photo *
-              </label>
-              <div className={`w-full px-4 py-3 bg-white border rounded-lg focus-within:ring-2 focus-within:ring-[#344c3d]/50 focus-within:border-[#344c3d] transition-all duration-200 ${
-                formErrors.portraitPhoto ? 'border-red-500' : 'border-[#344c3d]/20'
-              }`}>
-                <input
-                  id="portraitPhoto"
-                  type="file"
-                  accept="image/jpeg,image/png,image/jpg"
-                  name="portraitPhoto"
-                  className="w-full text-[#344c3d] file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#344c3d]/10 file:text-[#344c3d] hover:file:bg-[#344c3d]/20"
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              {formErrors.portraitPhoto && (
-                <p className="text-red-500 text-xs mt-1">{formErrors.portraitPhoto}</p>
-              )}
-              <p className="text-[#344c3d]/60 text-xs mt-1">
-                Upload a clear portrait photo. Max size: 5MB. Formats: JPEG, PNG
-              </p>
-            </div>
-          </div>
-
-          <div className="flex justify-end gap-4 mt-8">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-6 py-2.5 border border-[#344c3d]/20 text-[#344c3d] rounded-lg hover:bg-[#344c3d]/10 active:bg-[#344c3d]/20 transition-all duration-200"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="px-6 py-2.5 bg-[#344c3d] text-white rounded-lg hover:bg-[#344c3d]/90 active:bg-[#344c3d]/80 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? (
-                <span className="flex items-center gap-2">
-                  <motion.div 
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                    className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
-                  />
-                  Submitting...
-                </span>
-              ) : (
-                "Submit Application"
-              )}
-            </button>
-          </div>
-        </form>
-      </motion.div>
-    </div>
-  );
 };
 
+// Main Component
 interface Props {
   initialCompetition?: string | null;
 }
 
-export default function CompetitionSection({ }: Props) {
+export default function CompetitionSection({ initialCompetition }: Props) {
+  // State
   const [competitions, setCompetitions] = useState<Competition[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedCompetition, setSelectedCompetition] = useState<string | null>(null);
+  const [selectedCompetition, setSelectedCompetition] = useState<string | null>(initialCompetition || null);
   const [formOpen, setFormOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState<string | null>(null);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [selectedCard, setSelectedCard] = useState<string | null>(null);
+  
+  // Refs
   const competitionsRef = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
   
-  // Add these for authentication handling
+  // Hooks
   const navigate = useNavigate();
-  
-  // Since useModelAuth is causing issues, let's use localStorage directly
-  const [, setIsAuthenticated] = useState(false);
-  const [authModalOpen, setAuthModalOpen] = useState(false);
-  const [authMode] = useState<'login' | 'signup'>('login');
-  
+
   // Check authentication on component mount
   useEffect(() => {
     const token = localStorage.getItem('modelToken');
-    if (token) {
-setIsAuthenticated(() => true);
-    }
+    setIsAuthenticated(!!token);
+    
+    // Listen for storage changes (login/logout)
+    const handleStorageChange = () => {
+      const token = localStorage.getItem('modelToken');
+      setIsAuthenticated(!!token);
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
+  // Fetch competitions data
   const fetchCompetitions = useCallback(async (retryCount = 0) => {
     try {
       setLoading(true);
       setError(null);
       
-      const response = await fetch(`${API_BASE_URL}/api/competitions?page=${page}&limit=6`);
+      // Build query parameters
+      let queryParams = `page=${page}&limit=6`;
+      if (searchTerm) queryParams += `&search=${encodeURIComponent(searchTerm)}`;
+      if (filterStatus) queryParams += `&status=${filterStatus}`;
+      
+      const response = await fetch(`${API_BASE_URL}/api/competitions?${queryParams}`);
       const result: ApiResponse = await response.json();
       
       if (!response.ok) {
@@ -562,11 +161,11 @@ setIsAuthenticated(() => true);
         const formattedCompetitions = result.data.map(competition => ({
           ...competition,
           image: competition.competitionImage 
-            ? `${API_BASE_URL}/${competition.competitionImage.replace(/\\/g, "/")}` 
+            ? `${API_BASE_URL}/${competition.competitionImage.replace(/\\/g, "/")}`
             : "/placeholder.svg?height=240&width=360"
         }));
         
-        setCompetitions(formattedCompetitions);
+        setCompetitions(prev => page === 1 ? formattedCompetitions : [...prev, ...formattedCompetitions]);
         setHasMore(result.currentPage < result.totalPages);
       } else {
         throw new Error("Invalid data structure received from API");
@@ -574,8 +173,7 @@ setIsAuthenticated(() => true);
     } catch (error) {
       console.error('Error fetching competitions:', error);
       if (import.meta.env.DEV || retryCount >= RETRY_COUNT) {
-        console.log('Using sample competition data');
-        // Convert sample data to match Competition interface
+        // Use sample data in development or after max retries
         const formattedSampleData: Competition[] = sampleCompetitions.map(comp => ({
           _id: comp._id,
           title: comp.title,
@@ -585,12 +183,14 @@ setIsAuthenticated(() => true);
           endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
           applicationFee: 0,
           status: 'upcoming',
+          participants: [],
           daysUntilStart: 0,
           daysUntilEnd: 30
         }));
         setCompetitions(formattedSampleData);
         setHasMore(false);
       } else {
+        // Retry with exponential backoff
         const delay = RETRY_DELAY * Math.pow(2, retryCount);
         console.log(`Retrying in ${delay}ms...`);
         setTimeout(() => fetchCompetitions(retryCount + 1), delay);
@@ -599,39 +199,20 @@ setIsAuthenticated(() => true);
     } finally {
       setLoading(false);
     }
-  }, [page]);
+  }, [page, searchTerm, filterStatus]);
   
+  // Load competitions on mount and when page changes
   useEffect(() => {
+    setPage(1); // Reset page when search or filter changes
     fetchCompetitions();
-  }, [fetchCompetitions]);
+  }, [fetchCompetitions, searchTerm, filterStatus]);
 
-  // Add auth state check effect
-  useEffect(() => {
-    const checkAuth = () => {
-      const token = localStorage.getItem('modelToken');
-      const user = localStorage.getItem('user');
-      if (token && user) {
-        setIsAuthenticated(true);
-      } else {
-setIsAuthenticated(() => false);
-      }
-    };
-
-    checkAuth();
-    window.addEventListener('storage', checkAuth);
-    return () => window.removeEventListener('storage', checkAuth);
-  }, []);
-
+  // Handle apply button click
   const handleApply = (competitionId: string) => {
-    const token = localStorage.getItem('modelToken');
-    const user = localStorage.getItem('user');
-    
-    if (token && user) {
-      setIsAuthenticated(true);
+    if (isAuthenticated) {
       setSelectedCompetition(competitionId);
       setFormOpen(true);
     } else {
-      setIsAuthenticated(false);
       toast.error('Please sign in to apply for competitions');
       navigate('/login', { 
         state: { 
@@ -642,53 +223,314 @@ setIsAuthenticated(() => false);
     }
   };
 
-  // Update handleAuthSuccess
-  const handleAuthSuccess = () => {
-    setIsAuthenticated(true);
-    setAuthModalOpen(false);
-    // Check if we have a pending competition application
-    if (selectedCompetition) {
-      setFormOpen(true);
-    }
-  };
-
+  // Close application form
   const closeForm = () => {
     setFormOpen(false);
     setSelectedCompetition(null);
   };
 
-  const closeAuthModal = () => {
-    setAuthModalOpen(false);
-  };
-
-  // New function to determine status color
-  const getStatusStyles = (status: string) => {
-    switch(status) {
-      case 'active':
-        return {
-          bg: 'bg-gradient-to-r from-emerald-500 to-teal-500',
-          text: 'text-white',
-          icon: <TrendingUp className="w-3 h-3 mr-1" />
-        };
-      case 'upcoming':
-        return {
-          bg: 'bg-gradient-to-r from-amber-400 to-yellow-500',
-          text: 'text-white',
-          icon: <Calendar className="w-3 h-3 mr-1" />
-        };
-      default:
-        return {
-          bg: 'bg-gradient-to-r from-gray-400 to-gray-500',
-          text: 'text-white',
-          icon: <Clock className="w-3 h-3 mr-1" />
-        };
+  // Handle search
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchRef.current) {
+      setSearchTerm(searchRef.current.value);
     }
   };
 
+  // Clear search
+  const clearSearch = () => {
+    setSearchTerm("");
+    if (searchRef.current) {
+      searchRef.current.value = "";
+      searchRef.current.focus();
+    }
+  };
+
+  // Handle filter change
+  const handleFilterChange = (status: string | null) => {
+    setFilterStatus(status);
+    setIsFilterOpen(false);
+  };
+
+  // Handle card click for expanded view
+  const handleCardClick = (id: string) => {
+    setSelectedCard(id === selectedCard ? null : id);
+  };
+
+  // Render competition cards
+  const renderCompetitionCards = () => {
+    if (loading && competitions.length === 0) {
+      return Array.from({ length: 3 }).map((_, index) => (
+        <motion.div 
+          key={`skeleton-${index}`}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: index * 0.1 }}
+          className="bg-white rounded-3xl overflow-hidden border border-[#344c3d]/10 animate-pulse shadow-xl"
+        >
+          <div className="h-64 bg-[#344c3d]/5"></div>
+          <div className="p-6 space-y-3">
+            <div className="h-6 bg-[#344c3d]/5 rounded-lg w-3/4"></div>
+            <div className="h-4 bg-[#344c3d]/5 rounded-lg w-full"></div>
+            <div className="h-4 bg-[#344c3d]/5 rounded-lg w-5/6"></div>
+            <div className="h-10 bg-[#344c3d]/5 rounded-lg w-full mt-4"></div>
+          </div>
+        </motion.div>
+      ));
+    }
+    
+    if (competitions.length === 0) {
+      return (
+        <div className="col-span-full text-center py-20">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+            className="bg-white p-10 rounded-3xl shadow-xl max-w-lg mx-auto"
+          >
+            <Award className="w-16 h-16 text-[#344c3d]/30 mx-auto mb-6" />
+            <h3 className="text-2xl font-bold text-[#344c3d] mb-3">No Competitions Available</h3>
+            <p className="text-[#344c3d]/60">
+              {searchTerm || filterStatus 
+                ? "No competitions match your search criteria. Try adjusting your filters."
+                : "We're preparing something extraordinary. Check back soon for exclusive modeling opportunities."}
+            </p>
+            {(searchTerm || filterStatus) && (
+              <button
+                onClick={() => {
+                  setSearchTerm("");
+                  setFilterStatus(null);
+                  if (searchRef.current) searchRef.current.value = "";
+                }}
+                className="mt-6 px-6 py-2 bg-[#344c3d] text-white rounded-full text-sm font-medium hover:bg-[#2a3e31] transition-colors"
+              >
+                Clear Filters
+              </button>
+            )}
+          </motion.div>
+        </div>
+      );
+    }
+    
+    return competitions.map((competition, index) => (
+      <motion.div
+        key={competition._id}
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6, delay: index * 0.1 }}
+        className={`group relative ${viewMode === 'list' ? 'col-span-full' : ''}`}
+        onClick={() => viewMode === 'list' && handleCardClick(competition._id)}
+      >
+        <div className={`bg-white rounded-3xl overflow-hidden border border-[#344c3d]/10 transition-all duration-500 hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.2)] hover:translate-y-[-8px] h-full flex ${viewMode === 'list' ? 'flex-row' : 'flex-col'}`}>
+          {/* Card Image */}
+          <div className={`relative ${viewMode === 'list' ? 'w-1/3 min-w-[240px]' : 'aspect-[3/4]'} overflow-hidden`}>
+            <img 
+              src={competition.bannerImage 
+                ? `${API_BASE_URL}/${competition.bannerImage.replace(/\\/g, '/')}`
+                : competition.competitionImage 
+                  ? `${API_BASE_URL}/${competition.competitionImage.replace(/\\/g, '/')}`
+                  : "/placeholder.svg?height=400&width=300"
+              }
+              alt={competition.title}
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.src = "/placeholder.svg?height=400&width=300";
+              }}
+            />
+            
+            {/* Status Badge */}
+            <div className="absolute top-4 right-4 z-20">
+              <div className={`${getStatusStyles(competition.status).bg} px-3 py-1.5 rounded-full text-xs font-medium flex items-center shadow-lg`}>
+                {getStatusStyles(competition.status).icon}
+                <span>{competition.status.charAt(0).toUpperCase() + competition.status.slice(1)}</span>
+              </div>
+            </div>
+            
+            {/* Featured Tag - Example for special competitions */}
+            {index === 0 && (
+              <div className="absolute top-4 left-4 z-20">
+                <div className="bg-gradient-to-r from-purple-500 to-indigo-500 px-3 py-1.5 rounded-full text-xs font-medium flex items-center shadow-lg text-white">
+                  <Sparkles className="w-3 h-3 mr-1" />
+                  <span>Featured</span>
+                </div>
+              </div>
+            )}
+          </div>
+          
+          {/* Card Content */}
+          <div className={`p-6 flex flex-col flex-grow ${viewMode === 'list' ? 'w-2/3' : ''}`}>
+            <div className="flex justify-between items-start mb-2">
+              <h3 className="text-xl font-bold text-[#344c3d] font-['Clash_Display'] line-clamp-2">
+                {competition.title}
+              </h3>
+              
+              {viewMode === 'list' && (
+                <div className="flex items-center gap-2 text-xs text-[#344c3d]/60">
+                  <Calendar className="w-3.5 h-3.5" />
+                  <span>
+                    {format(new Date(competition.startDate), 'MMM dd')} - {format(new Date(competition.endDate), 'MMM dd, yyyy')}
+                  </span>
+                </div>
+              )}
+            </div>
+            
+            <p className={`text-[#344c3d]/70 text-sm mb-4 ${viewMode === 'list' ? 'line-clamp-3' : 'line-clamp-2'} flex-grow`}>
+              {competition.description}
+            </p>
+            
+            {viewMode === 'grid' && (
+              <div className="flex items-center gap-2 mb-4 text-xs text-[#344c3d]/60">
+                <Calendar className="w-3.5 h-3.5" />
+                <span>
+                  {format(new Date(competition.startDate), 'MMM dd')} - {format(new Date(competition.endDate), 'MMM dd, yyyy')}
+                </span>
+              </div>
+            )}
+            
+            {/* Stats Row */}
+            <div className={`grid ${viewMode === 'list' ? 'grid-cols-4 gap-4' : 'grid-cols-3 gap-2'} mb-5`}>
+              <div className="bg-[#344c3d]/5 rounded-lg p-2 text-center">
+                <p className="text-xs text-[#344c3d]/70 mb-1">Participants</p>
+                <p className="text-sm font-semibold text-[#344c3d]">{competition.participants?.length || 0}</p>
+              </div>
+              <div className="bg-[#344c3d]/5 rounded-lg p-2 text-center">
+                <p className="text-xs text-[#344c3d]/70 mb-1">Entry Fee</p>
+                <p className="text-sm font-semibold text-[#344c3d]">${competition.applicationFee}</p>
+              </div>
+              <div className="bg-[#344c3d]/5 rounded-lg p-2 text-center">
+                <p className="text-xs text-[#344c3d]/70 mb-1">Days Left</p>
+                <p className="text-sm font-semibold text-[#344c3d]">{competition.daysUntilEnd}</p>
+              </div>
+              {viewMode === 'list' && (
+                <div className="bg-[#344c3d]/5 rounded-lg p-2 text-center">
+                  <p className="text-xs text-[#344c3d]/70 mb-1">Status</p>
+                  <p className="text-sm font-semibold text-[#344c3d] capitalize">{competition.status}</p>
+                </div>
+              )}
+            </div>
+            
+            {/* Apply Button */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleApply(competition._id);
+              }}
+              disabled={competition.status === 'completed'}
+              className={`w-full py-3 rounded-xl font-medium transition-all duration-300 flex items-center justify-center gap-2
+                ${competition.status === 'completed' 
+                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  : 'bg-[#344c3d] text-white hover:bg-[#2a3e31]'
+                }`}
+            >
+              {competition.status === 'completed' ? (
+                'Competition Ended'
+              ) : (
+                <>
+                  <span>Apply Now</span>
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+        
+        {/* Expanded Card Details (for list view) */}
+        {viewMode === 'list' && selectedCard === competition._id && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="mt-4 bg-white rounded-2xl p-6 shadow-lg border border-[#344c3d]/10"
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div>
+                <h4 className="text-lg font-bold text-[#344c3d] mb-3">Competition Details</h4>
+                <p className="text-[#344c3d]/70 mb-4">{competition.description}</p>
+                
+                <h4 className="text-lg font-bold text-[#344c3d] mb-3">Requirements</h4>
+                <ul className="list-disc pl-5 text-[#344c3d]/70 space-y-1 mb-4">
+                  <li>Age: 18-30 years</li>
+                  <li>Professional portfolio</li>
+                  <li>Valid ID/Passport</li>
+                  <li>Application fee: ${competition.applicationFee}</li>
+                </ul>
+              </div>
+              
+              <div>
+                <h4 className="text-lg font-bold text-[#344c3d] mb-3">Timeline</h4>
+                <div className="space-y-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-full bg-[#344c3d] flex items-center justify-center mt-0.5">
+                      <span className="text-white text-xs">1</span>
+                    </div>
+                    <div>
+                      <p className="font-medium text-[#344c3d]">Application Period</p>
+                      <p className="text-sm text-[#344c3d]/70">
+                        {format(new Date(competition.startDate), 'MMMM dd, yyyy')} - {format(new Date(competition.endDate), 'MMMM dd, yyyy')}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-full bg-[#344c3d]/80 flex items-center justify-center mt-0.5">
+                      <span className="text-white text-xs">2</span>
+                    </div>
+                    <div>
+                      <p className="font-medium text-[#344c3d]">Selection Process</p>
+                      <p className="text-sm text-[#344c3d]/70">
+                        {format(new Date(competition.endDate), 'MMMM dd, yyyy')} - {format(new Date(new Date(competition.endDate).getTime() + 14 * 24 * 60 * 60 * 1000), 'MMMM dd, yyyy')}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-full bg-[#344c3d]/60 flex items-center justify-center mt-0.5">
+                      <span className="text-white text-xs">3</span>
+                    </div>
+                    <div>
+                      <p className="font-medium text-[#344c3d]">Final Event</p>
+                      <p className="text-sm text-[#344c3d]/70">
+                        {format(new Date(new Date(competition.endDate).getTime() + 30 * 24 * 60 * 60 * 1000), 'MMMM dd, yyyy')}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleApply(competition._id);
+                  }}
+                  disabled={competition.status === 'completed'}
+                  className={`mt-6 w-full py-3 rounded-xl font-medium transition-all duration-300 flex items-center justify-center gap-2
+                    ${competition.status === 'completed' 
+                      ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                      : 'bg-[#344c3d] text-white hover:bg-[#2a3e31]'
+                    }`}
+                >
+                  {competition.status === 'completed' ? (
+                    'Competition Ended'
+                  ) : (
+                    <>
+                      <span>Apply Now</span>
+                      <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </motion.div>
+    ));
+  };
+
   return (
-    <div className="w-full py-24 sm:py-32 bg-gradient-to-b from-[#f8f5f0] to-[#f0ebe0] -mt-8 relative overflow-hidden">
+    <div className="w-full py-24 sm:py-32 bg-w -mt-8 relative overflow-hidden">
       {/* Decorative elements */}
-      <div className="absolute top-0 left-0 w-full h-64 bg-gradient-to-b from-[#344c3d]/10 to-transparent pointer-events-none"></div>
+      <div className="absolute top-0 left-0 w-full h-64 pointer-events-none"></div>
       <motion.div 
         className="absolute -top-40 -right-40 w-80 h-80 rounded-full border border-[#344c3d]/10"
         animate={{ rotate: 360 }}
@@ -701,8 +543,8 @@ setIsAuthenticated(() => false);
       />
       
       <div className="container mx-auto px-4 max-w-[1920px] relative z-10">
-        {/* Enhanced Header Section */}
-        <div className="text-center mb-20 max-w-4xl mx-auto">
+        {/* Header Section */}
+        <div className="text-center mb-16 max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -744,150 +586,141 @@ setIsAuthenticated(() => false);
           </motion.p>
         </div>
 
-        {error && <ErrorAlert message={error} />}
-
-        {/* Enhanced Competition Cards */}
+        {/* Search and Filter Bar */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.5 }}
+          viewport={{ once: true }}
+          className="bg-white rounded-2xl p-4 shadow-lg mb-10 mx-4 sm:mx-6 lg:mx-8"
+        >
+          <div className="flex flex-col md:flex-row gap-4">
+            <form onSubmit={handleSearch} className="flex-grow relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#344c3d]/40 h-5 w-5" />
+              <input
+                ref={searchRef}
+                type="text"
+                placeholder="Search competitions..."
+                className="w-full pl-10 pr-10 py-3 rounded-xl border border-[#344c3d]/10 focus:outline-none focus:ring-2 focus:ring-[#344c3d]/20 focus:border-[#344c3d]/30"
+                defaultValue={searchTerm}
+              />
+              {searchTerm && (
+                <button
+                  type="button"
+                  onClick={clearSearch}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#344c3d]/40 hover:text-[#344c3d] transition-colors"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              )}
+            </form>
+            
+            <div className="flex gap-4">
+              <div className="relative">
+                <button
+                  onClick={() => setIsFilterOpen(!isFilterOpen)}
+                  className="flex items-center gap-2 px-4 py-3 rounded-xl border border-[#344c3d]/10 bg-white hover:bg-[#344c3d]/5 transition-colors"
+                >
+                  <Filter className="h-5 w-5 text-[#344c3d]" />
+                  <span className="text-[#344c3d]">
+                    {filterStatus ? `Status: ${filterStatus}` : "Filter"}
+                  </span>
+                  <ChevronDown className={`h-4 w-4 text-[#344c3d] transition-transform ${isFilterOpen ? 'rotate-180' : ''}`} />
+                </button>
+                
+                {isFilterOpen && (
+                  <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-[#344c3d]/10 overflow-hidden z-50">
+                    <div className="p-2">
+                      <button
+                        onClick={() => handleFilterChange(null)}
+                        className="w-full text-left px-3 py-2 text-sm text-[#344c3d] hover:bg-[#344c3d]/5 rounded-lg transition-colors flex items-center justify-between"
+                      >
+                        <span>All Competitions</span>
+                        {filterStatus === null && <div className="w-2 h-2 rounded-full bg-[#344c3d]"></div>}
+                      </button>
+                      <button
+                        onClick={() => handleFilterChange('active')}
+                        className="w-full text-left px-3 py-2 text-sm text-[#344c3d] hover:bg-[#344c3d]/5 rounded-lg transition-colors flex items-center justify-between"
+                      >
+                        <span>Active</span>
+                        {filterStatus === 'active' && <div className="w-2 h-2 rounded-full bg-[#344c3d]"></div>}
+                      </button>
+                      <button
+                        onClick={() => handleFilterChange('upcoming')}
+                        className="w-full text-left px-3 py-2 text-sm text-[#344c3d] hover:bg-[#344c3d]/5 rounded-lg transition-colors flex items-center justify-between"
+                      >
+                        <span>Upcoming</span>
+                        {filterStatus === 'upcoming' && <div className="w-2 h-2 rounded-full bg-[#344c3d]"></div>}
+                      </button>
+                      <button
+                        onClick={() => handleFilterChange('completed')}
+                        className="w-full text-left px-3 py-2 text-sm text-[#344c3d] hover:bg-[#344c3d]/5 rounded-lg transition-colors flex items-center justify-between"
+                      >
+                        <span>Completed</span>
+                        {filterStatus === 'completed' && <div className="w-2 h-2 rounded-full bg-[#344c3d]"></div>}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            
+              {/* View Mode Toggle */}
+              <div className="flex rounded-xl border border-[#344c3d]/10 overflow-hidden">
+                <button
+                  onClick={() => setViewMode('grid')}
+                  className={`px-4 py-3 flex items-center justify-center ${
+                    viewMode === 'grid' 
+                      ? 'bg-[#344c3d] text-white' 
+                      : 'bg-white text-[#344c3d] hover:bg-[#344c3d]/5'
+                  } transition-colors`}
+                  aria-label="Grid view"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="3" width="7" height="7" />
+                    <rect x="14" y="3" width="7" height="7" />
+                    <rect x="3" y="14" width="7" height="7" />
+                    <rect x="14" y="14" width="7" height="7" />
+                  </svg>
+                </button>
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`px-4 py-3 flex items-center justify-center ${
+                    viewMode === 'list' 
+                      ? 'bg-[#344c3d] text-white' 
+                      : 'bg-white text-[#344c3d] hover:bg-[#344c3d]/5'
+                  } transition-colors`}
+                  aria-label="List view"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="8" y1="6" x2="21" y2="6" />
+                    <line x1="8" y1="12" x2="21" y2="12" />
+                    <line x1="8" y1="18" x2="21" y2="18" />
+                    <line x1="3" y1="6" x2="3.01" y2="6" />
+                    <line x1="3" y1="12" x2="3.01" y2="12" />
+                    <line x1="3" y1="18" x2="3.01" y2="18" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+        
+        {/* Error message */}
+        {error && (
+          <div className="mb-8">
+            <ErrorAlert message={error} />
+          </div>
+        )}
+        
+        {/* Competition Cards */}
         <div 
           ref={competitionsRef}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 mt-8"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10 mt-8 px-4 sm:px-6 lg:px-8"
         >
-          {loading ? (
-            // Enhanced Loading Skeleton
-            Array.from({ length: 3 }).map((_, index) => (
-              <motion.div 
-                key={`skeleton-${index}`}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="bg-white rounded-3xl overflow-hidden border border-[#344c3d]/10 animate-pulse shadow-xl"
-              >
-                <div className="h-80 bg-[#344c3d]/5"></div>
-                <div className="p-8 space-y-4">
-                  <div className="h-8 bg-[#344c3d]/5 rounded-lg w-3/4"></div>
-                  <div className="h-4 bg-[#344c3d]/5 rounded-lg w-full"></div>
-                  <div className="h-4 bg-[#344c3d]/5 rounded-lg w-5/6"></div>
-                  <div className="h-12 bg-[#344c3d]/5 rounded-lg w-full mt-6"></div>
-                </div>
-              </motion.div>
-            ))
-          ) : competitions.length === 0 ? (
-            <div className="col-span-full text-center py-20">
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5 }}
-                className="bg-white p-10 rounded-3xl shadow-xl max-w-lg mx-auto"
-              >
-                <Award className="w-16 h-16 text-[#344c3d]/30 mx-auto mb-6" />
-                <h3 className="text-2xl font-bold text-[#344c3d] mb-3">No Competitions Available</h3>
-                <p className="text-[#344c3d]/60">
-                  We're preparing something extraordinary. Check back soon for exclusive modeling opportunities.
-                </p>
-              </motion.div>
-            </div>
-          ) : (
-            // Enhanced Competition Cards with luxury styling
-            competitions.map((competition, index) => (
-              <motion.div
-                key={competition._id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="group"
-              >
-                <div className="bg-white rounded-3xl overflow-hidden border border-[#344c3d]/10 transition-all duration-500 shadow-xl hover:shadow-2xl hover:translate-y-[-8px] h-full flex flex-col">
-                  {/* Enhanced Image Container */}
-                  <div className="relative h-80 overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent z-10"></div>
-                    <img 
-                      src={`${API_BASE_URL}/${competition.competitionImage}`}
-                      alt={competition.title}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.src = "/placeholder.svg?height=240&width=360";
-                      }}
-                    />
-                    
-                    {/* Enhanced Status Badge */}
-                    <div className="absolute top-6 right-6 z-20">
-                      <div className={`${getStatusStyles(competition.status).bg} ${getStatusStyles(competition.status).text} px-4 py-2 rounded-full text-sm font-medium flex items-center shadow-lg`}>
-                        {getStatusStyles(competition.status).icon}
-                        <span>{competition.status.charAt(0).toUpperCase() + competition.status.slice(1)}</span>
-                      </div>
-                    </div>
-                    
-                    {/* Social-media style engagement indicators */}
-                    <div className="absolute bottom-6 left-6 z-20 flex items-center gap-4">
-                      <div className="flex items-center gap-2 text-white">
-                        <Users className="w-4 h-4" />
-                        <span className="text-sm font-medium">{Math.floor(Math.random() * 500) + 50}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-white">
-                        <Globe className="w-4 h-4" />
-                        <span className="text-sm font-medium">{Math.floor(Math.random() * 20) + 5} countries</span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Enhanced Content Container */}
-                  <div className="p-8 flex flex-col flex-grow">
-                    <div className="mb-4 flex items-center gap-2">
-                      <div className="w-1 h-6 bg-gradient-to-b from-[#344c3d] to-[#5d8a6f]"></div>
-                      <h3 className="text-2xl font-bold text-[#344c3d] font-['Clash_Display'] line-clamp-2">
-                        {competition.title}
-                      </h3>
-                    </div>
-                    
-                    <p className="text-[#344c3d]/70 mb-6 text-base leading-relaxed line-clamp-3 flex-grow">
-                      {competition.description}
-                    </p>
-                    
-                    {/* Enhanced Stats Section */}
-                    <div className="grid grid-cols-2 gap-4 mb-8">
-                      <div className="bg-[#f8f5f0] rounded-xl p-3 flex flex-col items-center">
-                        <span className="text-[#344c3d]/60 text-xs uppercase tracking-wider mb-1">Starts</span>
-                        <span className="text-[#344c3d] font-medium">
-                          {new Date(competition.startDate).toLocaleDateString('en-US', {
-                            month: 'short',
-                            day: 'numeric'
-                          })}
-                        </span>
-                      </div>
-                      <div className="bg-[#f8f5f0] rounded-xl p-3 flex flex-col items-center">
-                        <span className="text-[#344c3d]/60 text-xs uppercase tracking-wider mb-1">Remaining</span>
-                        <span className="text-[#344c3d] font-medium">{competition.daysUntilEnd} days</span>
-                      </div>
-                    </div>
-
-                    {/* Enhanced Apply Button */}
-                    <button
-                      onClick={() => handleApply(competition._id)}
-                      disabled={competition.status === 'completed'}
-                      className={`w-full py-4 rounded-xl font-medium text-base transition-all duration-300 flex items-center justify-center gap-2
-                        ${competition.status === 'completed' 
-                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                          : 'bg-gradient-to-r from-[#344c3d] to-[#5d8a6f] text-white hover:shadow-lg hover:shadow-[#344c3d]/20'
-                        }`}
-                    >
-                      {competition.status === 'completed' ? (
-                        'Competition Ended'
-                      ) : (
-                        <>
-                          <span>Apply Now</span>
-                          <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </div>
-              </motion.div>
-            ))
-          )}
+          {renderCompetitionCards()}
         </div>
         
-        {/* Enhanced "Load More" button with luxury styling */}
+        {/* Load More Button */}
         {!loading && competitions.length > 0 && hasMore && (
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -905,29 +738,156 @@ setIsAuthenticated(() => false);
           </motion.div>
         )}
         
-       
+        {/* Featured Competitions Section */}
+        {competitions.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="mt-32 px-4 sm:px-6 lg:px-8"
+          >
+            <div className="text-center mb-16">
+              <h3 className="text-3xl sm:text-4xl font-bold text-[#344c3d] mb-4 font-['Clash_Display']">
+                Highlighted Opportunities
+              </h3>
+              <p className="text-[#344c3d]/70 max-w-2xl mx-auto">
+                These premium competitions offer exceptional exposure and career advancement opportunities for models.
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Featured Competition 1 */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                className="bg-gradient-to-br from-[#344c3d] to-[#1a2a20] text-white rounded-3xl overflow-hidden shadow-xl relative group"
+              >
+                <div className="absolute inset-0 bg-black/20 z-10"></div>
+                <img 
+                  src="/images/featured-competition-1.jpg" 
+                  alt="International Model Search"
+                  className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-50 transition-opacity duration-500"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = "https://images.unsplash.com/photo-1469334031218-e382a71b716b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80";
+                  }}
+                />
+                <div className="relative z-20 p-8 h-full flex flex-col">
+                  <div className="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium w-fit mb-auto">
+                    Premium
+                  </div>
+                  <div className="mt-auto">
+                    <h4 className="text-2xl font-bold mb-2">International Model Search</h4>
+                    <p className="text-white/80 mb-6 line-clamp-2">Global competition with opportunities to work with top fashion brands and photographers.</p>
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center gap-2">
+                        <Users className="h-4 w-4 text-white/70" />
+                        <span className="text-sm text-white/70">1,234 Participants</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <DollarSign className="h-4 w-4 text-white/70" />
+                        <span className="text-sm text-white/70">$250 Entry</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+              
+              {/* Featured Competition 2 */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="bg-gradient-to-br from-[#6cbc8b] to-[#4a8a63] text-white rounded-3xl overflow-hidden shadow-xl relative group"
+              >
+                <div className="absolute inset-0 bg-black/20 z-10"></div>
+                <img 
+                  src="/images/featured-competition-2.jpg" 
+                  alt="Fashion Week Casting"
+                  className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-50 transition-opacity duration-500"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = "https://images.unsplash.com/photo-1509631179647-0177331693ae?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1476&q=80";
+                  }}
+                />
+                <div className="relative z-20 p-8 h-full flex flex-col">
+                  <div className="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium w-fit mb-auto">
+                    Exclusive
+                  </div>
+                  <div className="mt-auto">
+                    <h4 className="text-2xl font-bold mb-2">Fashion Week Casting</h4>
+                    <p className="text-white/80 mb-6 line-clamp-2">Walk the runway at the prestigious African Fashion Week with top designers.</p>
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center gap-2">
+                        <Users className="h-4 w-4 text-white/70" />
+                        <span className="text-sm text-white/70">876 Participants</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <DollarSign className="h-4 w-4 text-white/70" />
+                        <span className="text-sm text-white/70">$150 Entry</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+              
+              {/* Featured Competition 3 */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+                className="bg-gradient-to-br from-[#d4a373] to-[#a07942] text-white rounded-3xl overflow-hidden shadow-xl relative group"
+              >
+                <div className="absolute inset-0 bg-black/20 z-10"></div>
+                <img 
+                  src="/images/featured-competition-3.jpg" 
+                  alt="Emerging Talent Awards"
+                  className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-50 transition-opacity duration-500"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = "https://images.unsplash.com/photo-1581338834647-b0fb40704e21?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80";
+                  }}
+                />
+                <div className="relative z-20 p-8 h-full flex flex-col">
+                  <div className="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium w-fit mb-auto">
+                    New Talent
+                  </div>
+                  <div className="mt-auto">
+                    <h4 className="text-2xl font-bold mb-2">Emerging Talent Awards</h4>
+                    <p className="text-white/80 mb-6 line-clamp-2">Dedicated to discovering and promoting fresh faces in the modeling industry.</p>
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center gap-2">
+                        <Users className="h-4 w-4 text-white/70" />
+                        <span className="text-sm text-white/70">543 Participants</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <DollarSign className="h-4 w-4 text-white/70" />
+                        <span className="text-sm text-white/70">$50 Entry</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          </motion.div>
+        )}
+        
+   
       </div>
       
-      {/* Application Form Modal */}
+
       {formOpen && selectedCompetition && (
-        <ApplicationForm
+        <CompetitionApplicationForm
           isOpen={formOpen}
           onClose={closeForm}
           competitionId={selectedCompetition}
         />
       )}
-      
-      {/* Auth Modal */}
-      {authModalOpen && (
-        <AuthModal 
-          isOpen={authModalOpen}
-          onClose={closeAuthModal}
-          mode={authMode}
-
-          onSuccess={handleAuthSuccess} setMode={function (): void {
-            throw new Error("Function not implemented.")
-          } }        />
-      )}
-    </div>
+    </div> 
   );
 }

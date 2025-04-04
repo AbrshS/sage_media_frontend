@@ -1,11 +1,12 @@
-import { motion,  } from 'framer-motion';
-import { Plus, Minus, Search, HelpCircle } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Plus, Minus, Search, HelpCircle, Award } from 'lucide-react';
 import { useState } from 'react';
 import { Input } from "@/components/ui/input";
-import { Shield, Image, Laptop } from 'lucide-react';
+import { Shield, Image, Laptop, Trophy } from 'lucide-react';
 
 export default function FAQ() {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [activeCategory, setActiveCategory] = useState<number>(0);
   const [searchQuery, setSearchQuery] = useState('');
 
   const faqCategories = [
@@ -25,7 +26,7 @@ export default function FAQ() {
     },
     {
       title: "Competitions",
-      icon: HelpCircle,
+      icon: Trophy,
       questions: [
         {
           q: "How does voting work?",
@@ -82,98 +83,143 @@ export default function FAQ() {
     }
   ];
 
-  // Add these imports at the top of the file
+  // Filter questions based on search query
+  const filteredCategories = faqCategories.map(category => ({
+    ...category,
+    questions: category.questions.filter(faq => 
+      faq.q.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      faq.a.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  })).filter(category => category.questions.length > 0);
 
   return (
-    <div className="min-h-screen bg-white py-20 mt-4 rounded-3xl">
-      <div className="max-w-4xl mx-auto px-4">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-6xl font-bold text-[#344c3d] mb-6 font-['Clash_Display']">
-            Frequently Asked
-            <span className="block mt-2">Questions</span>
+    <div className="min-h-screen bg-gradient-to-b from-[#AEE0AE]/30 to-white py-24">
+      <div className="max-w-5xl mx-auto px-6">
+        {/* Luxury Header */}
+        <div className="text-center mb-20 relative">
+          {/* Decorative elements */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-1 bg-[#6B8E6E]"></div>
+          
+          <h1 className="text-5xl md:text-6xl font-bold text-[#344C3D] mt-8 mb-6 font-['Playfair_Display']">
+            Frequently Asked Questions
           </h1>
           
-          {/* Search */}
-          <div className="relative max-w-xl mx-auto">
+          <p className="text-[#49695C] text-lg max-w-2xl mx-auto mb-12">
+            Find answers to common questions about our platform, competitions, and services.
+          </p>
+          
+          {/* Luxury Search */}
+          <div className="relative max-w-2xl mx-auto">
             <Input
               type="text"
               placeholder="Search questions..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-14 pl-12 pr-6 rounded-full text-lg border-2 border-[#344c3d]/10 focus:border-[#344c3d] focus:ring-0 transition-colors"
+              className="w-full h-16 pl-14 pr-6 rounded-full text-lg border-2 border-[#89B890]/30 focus:border-[#89B890] focus:ring-0 transition-colors bg-white/80 backdrop-blur-sm shadow-sm placeholder-[#89B890]"
             />
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#344c3d]/40" />
+            <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-[#89B890]" />
           </div>
         </div>
 
-        {/* FAQs */}
-        <div className="space-y-4">
-          {faqCategories.map((category, categoryIndex) => (
-            <motion.div
-              key={categoryIndex}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: categoryIndex * 0.1 }}
-              className="group"
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-[#344c3d]/5 flex items-center justify-center">
-                  <category.icon className="w-5 h-5 text-[#344c3d]" />
-                </div>
-                <h2 className="text-2xl font-semibold text-[#344c3d]">{category.title}</h2>
-              </div>
-              
-              <div className="space-y-3">
-                {category.questions.map((faq, index) => (
-                  <motion.div key={`${categoryIndex}-${index}`} className="bg-white">
-                    <button
-                      onClick={() => setActiveIndex(activeIndex === index ? null : index)}
-                      className="w-full flex items-center justify-between p-6 text-left hover:bg-[#344c3d]/5 border-b-2 border-[#344c3d]/10 transition-all duration-300"
-                    >
-                      <span className="text-xl font-medium text-[#344c3d] pr-8">{faq.q}</span>
-                      {activeIndex === index ? (
-                        <Minus className="w-6 h-6 text-[#344c3d]" />
-                      ) : (
-                        <Plus className="w-6 h-6 text-[#344c3d]" />
-                      )}
-                    </button>
-                    
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ 
-                        height: activeIndex === index ? "auto" : 0,
-                        opacity: activeIndex === index ? 1 : 0
-                      }}
-                      transition={{ duration: 0.3 }}
-                      className="overflow-hidden"
-                    >
-                      <div className="p-6 bg-[#344c3d]/5">
-                        <p className="text-lg text-[#4a6d57] leading-relaxed">
-                          {faq.a}
-                        </p>
-                      </div>
-                    </motion.div>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-          ))}
+        {/* Category Navigation - Horizontal Tabs */}
+        <div className="mb-12 overflow-x-auto hide-scrollbar">
+          <div className="flex space-x-2 min-w-max">
+            {faqCategories.map((category, index) => (
+              <button
+                key={index}
+                onClick={() => setActiveCategory(index)}
+                className={`px-6 py-4 rounded-full flex items-center gap-2 transition-all duration-300 whitespace-nowrap ${
+                  activeCategory === index 
+                    ? 'bg-[#344C3D] text-white shadow-md' 
+                    : 'bg-white/80 text-[#344C3D] hover:bg-[#89B890]/10 border border-[#89B890]/30'
+                }`}
+              >
+                <category.icon className={`w-5 h-5 ${activeCategory === index ? 'text-[#89B890]' : 'text-[#6B8E6E]'}`} />
+                <span className="font-medium">{category.title}</span>
+              </button>
+            ))}
+          </div>
         </div>
 
-        {/* Contact Support */}
+        {/* FAQs - Luxury Accordion */}
+        <div className="bg-white rounded-2xl shadow-xl p-8 border border-[#89B890]/10">
+          <div className="flex items-center gap-3 mb-8 border-b border-[#89B890]/20 pb-6">
+            <div className="w-12 h-12 rounded-full bg-[#344C3D] flex items-center justify-center">
+              <Trophy className="w-6 h-6 text-[#6B8E6E]" />
+            </div>
+            <h2 className="text-2xl font-bold text-[#344C3D] font-['Playfair_Display']">
+              {faqCategories[activeCategory].title}
+            </h2>
+          </div>
+          
+          <div className="space-y-4">
+            {faqCategories[activeCategory].questions.map((faq, index) => (
+              <motion.div 
+                key={index} 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3 }}
+                className="border border-[#89B890]/20 rounded-xl overflow-hidden"
+              >
+                <button
+                  onClick={() => setActiveIndex(activeIndex === index ? null : index)}
+                  className="w-full flex items-center justify-between p-6 text-left hover:bg-[#89B890]/5 transition-all duration-300"
+                >
+                  <span className="text-xl font-medium text-[#344C3D] pr-8">{faq.q}</span>
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-300 ${
+                    activeIndex === index ? 'bg-[#344C3D]' : 'bg-[#89B890]/20'
+                  }`}>
+                    {activeIndex === index ? (
+                      <Minus className="w-4 h-4 text-[#89B890]" />
+                    ) : (
+                      <Plus className="w-4 h-4 text-[#89B890]" />
+                    )}
+                  </div>
+                </button>
+                
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ 
+                    height: activeIndex === index ? "auto" : 0,
+                    opacity: activeIndex === index ? 1 : 0
+                  }}
+                  transition={{ duration: 0.3 }}
+                  className="overflow-hidden"
+                >
+                  <div className="p-6 bg-[#AEE0AE]/20">
+                    <p className="text-lg text-[#49695C] leading-relaxed">
+                      {faq.a}
+                    </p>
+                  </div>
+                </motion.div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        {/* Contact Support - Luxury Style */}
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="mt-16 text-center"
+          className="mt-16 text-center bg-[#344C3D] text-white p-10 rounded-2xl shadow-lg relative overflow-hidden"
         >
-          <p className="text-[#4a6d57] text-lg">
-            Still have questions? {" "}
-            <a href="/contact" className="text-[#344c3d] font-semibold hover:underline">
-              Contact our support team
-            </a>
+          {/* Decorative elements */}
+          <div className="absolute top-0 left-0 w-full h-full opacity-10">
+            <div className="absolute top-4 right-4 w-40 h-40 rounded-full border border-[#89B890]/50"></div>
+            <div className="absolute bottom-4 left-4 w-24 h-24 rounded-full border border-[#89B890]/50"></div>
+          </div>
+          
+          <h3 className="text-2xl font-bold mb-4 font-['Playfair_Display']">Still Have Questions?</h3>
+          <p className="text-white/80 text-lg mb-6 max-w-xl mx-auto">
+            Our dedicated support team is ready to assist you with any inquiries not covered in our FAQ.
           </p>
+          <a 
+            href="/contact" 
+            className="inline-flex items-center gap-2 px-8 py-3 bg-[#6B8E6E] text-white rounded-full hover:bg-[#89B890] transition-colors font-medium"
+          >
+            Contact Support
+          </a>
         </motion.div>
       </div>
     </div>
