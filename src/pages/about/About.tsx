@@ -54,7 +54,7 @@ export default function About() {
         ref={el => sectionRefs.current[0] = el}
         className="relative min-h-[90vh] flex items-center"
       >
-        <div className="absolute inset-0 bg-emerald-950">
+        <div className="absolute inset-0 ">
           {/* Simple overlay */}
           <div className="absolute inset-0 opacity-30">
             <img 
@@ -66,7 +66,7 @@ export default function About() {
           <div className="absolute inset-0 bg-gradient-to-r from-emerald-950/90 to-emerald-950/80" />
         </div>
         
-        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 ">
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-white mb-6">
               <span className="text-sm font-medium">OUR STORY</span>

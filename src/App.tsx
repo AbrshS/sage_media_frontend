@@ -1,7 +1,8 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, BrowserRouter } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './contexts/AuthContext';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import { NotificationProvider } from './contexts/NotificationContext';
 
 // Pages
 import HomePage from './pages/home/Home';
@@ -35,43 +36,45 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 // Your Google Client ID - you'll need to get this from the Google Cloud Console
 // Define API_URL constant
 const API_URL = 'http://localhost:3000/api';
-const GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID';
+// const GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID';
 
 function App() {
   return (
-    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
       <AuthProvider>
-        <Router>    
-        <Layout>
-          <Toaster position="top-center" />
-          <Routes>
-            {/* Auth routes */}
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route 
-              path="/reset-password/:token" 
-              element={<ResetPassword API_URL={API_URL} />} 
-            />
-            {/* Update this line to match the navigation path */}
-            <Route path="/forgot-password" element={<ForgotPassword onClose={function (): void {
-                throw new Error('Function not implemented.');
-              } } apiUrl={''} />} />
-            
-            {/* Public routes */}
-            <Route path="/" element={<HomePage />} />
-            <Route path="/leaderboard" element={<Leaderboard />} />
-               
-            {/* Profile routes */}
-            <Route 
-              path="/profile" 
-              element={
-                <ProtectedRoute>
-                  <ModelProfilePage />
-                </ProtectedRoute>
-              } 
-            />  
+        <NotificationProvider>
+          <BrowserRouter>
+          
+            <Layout>
+              <Toaster position="top-center" />
+              <Routes>
+                {/* Auth routes */}
+                <Route path="/register" element={<RegisterPage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route 
+                  path="/reset-password/:token" 
+                  element={<ResetPassword API_URL={API_URL} />} 
+                />
+                {/* Update this line to match the navigation path */}
+                <Route path="/forgot-password" element={<ForgotPassword onClose={function (): void {
+                    throw new Error('Function not implemented.');
+                  } } apiUrl={''} />} />
+                
+                {/* Public routes */}
+                <Route path="/" element={<HomePage />} />
+                <Route path="/leaderboard" element={<Leaderboard />} />
+                   
+                {/* Profile routes */}
+                <Route 
+                  path="/profile" 
+                  element={
+                    <ProtectedRoute>
+                      <ModelProfilePage />
+                    </ProtectedRoute>
+                  } 
+                />  
 
- 
+     
 <Route 
               path="/edit-profile" 
               element={
@@ -86,8 +89,9 @@ function App() {
 
 
           </Routes>   
-        </Layout>  
-        </Router>
+        </Layout>   
+          </BrowserRouter>
+        </NotificationProvider>
       </AuthProvider>
     </GoogleOAuthProvider> 
   );

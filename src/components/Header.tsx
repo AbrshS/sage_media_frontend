@@ -2,13 +2,13 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Bell, Menu, X, User } from "lucide-react";
+import { Bell, Menu, X, User, LogOut } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
+import { Info, XCircle } from "lucide-react";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [showModelAuth, setShowModelAuth] = useState(false);
-  const [authMode, setAuthMode] = useState<"login" | "register">("login");
   const [modelUser, setModelUser] = useState<null | {id: string, name: string, profileImage?: string}>(null);
   const [loading, setLoading] = useState(true);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -39,17 +39,36 @@ export default function Header() {
   );
 
   // Check if user is logged in
-  useEffect(() => {
+  // Add this function at the top of your component
+  // First, update the isAuthenticated function
+  const isAuthenticated = () => {
     const token = localStorage.getItem('modelToken');
-    const userId = localStorage.getItem('userId');
-    
-    if (token && userId) {
-      // User is logged in
-      setModelUser({ id: userId, name: "User" });
-    }
-    
-    setLoading(false);
+    return !!token;
+  };
+  
+  // Update the useEffect for auth check
+  useEffect(() => {
+    const checkAuth = () => {
+      const token = localStorage.getItem('modelToken');
+      const userId = localStorage.getItem('userId');
+      
+      if (token && userId) {
+        setModelUser({ 
+          id: userId, 
+          name: localStorage.getItem('userName') || 'User'
+        });
+      } else {
+        setModelUser(null);
+      }
+      setLoading(false);
+    };
+  
+    checkAuth();
+    // Add event listener for storage changes
+    window.addEventListener('storage', checkAuth);
+    return () => window.removeEventListener('storage', checkAuth);
   }, []);
+
 
   // Handle scroll events
   useEffect(() => {
@@ -62,18 +81,17 @@ export default function Header() {
   }, []);
 
   const handleLogin = () => {
-    setAuthMode("login");
-    setShowModelAuth(true);
+    navigate('/login');
   };
 
   const handleRegister = () => {
-    setAuthMode("register");
-    setShowModelAuth(true);
+    navigate('/register');
   };
 
   const handleLogout = () => {
     localStorage.removeItem('modelToken');
     localStorage.removeItem('userId');
+    localStorage.removeItem('userName');
     setModelUser(null);
     navigate('/');
   };
@@ -94,7 +112,6 @@ export default function Header() {
           {/* Logo */}
           <Link to="/" className="flex items-center">
             <img src="/logo.png" alt="Sage Media" className="h-10" />
-
           </Link>
 
           {/* Desktop Navigation */}
@@ -111,55 +128,50 @@ export default function Header() {
             <Link to="/leaderboard" className="text-[#3a4b3c] hover:text-[#6cbc8b] font-medium transition-colors">
               Leaderboard
             </Link>
-            <Link to="/about" className="text-[#3a4b3c] hover:text-[#6cbc8b] font-medium transition-colors">
-              About
-            </Link>
           </nav>
 
           {/* Auth Buttons / User Menu */}
+       
+         
           <div className="hidden md:flex items-center space-x-4">
             {loading ? (
-              <div className="w-8 h-8 rounded-full bg-[#e2f8e5] animate-pulse"></div>
-            ) : modelUser ? (
-              <div className="flex items-center">
-                <Link to="/dashboard" className="relative mr-4">
-                  <Bell className="h-5 w-5 text-[#3a4b3c] hover:text-[#6cbc8b]" />
-                  <Badge className="absolute -top-1 -right-1 bg-[#6cbc8b] text-white text-xs px-1.5 py-0.5 rounded-full">
-                    3
-                  </Badge>
-                </Link>
+              <div className="w-8 h-8 rounded-full bg-[#e2f8e5] animate-pulse" />
+            ) : isAuthenticated() ? (
+              <div className="flex items-center space-x-2">
+                <NotificationDropdown />
                 <Button 
                   variant="ghost" 
-                  className="flex items-center text-[#3a4b3c] hover:text-[#6cbc8b] hover:bg-white/20"
+                  size="icon"
+                  className="text-[#3a4b3c] hover:text-[#6cbc8b]"
                   onClick={() => navigate('/profile')}
                 >
-                  <User className="h-5 w-5 mr-2" />
-                  <span>Profile</span>
+                  <User className="h-5 w-5" />
                 </Button>
                 <Button 
-                  variant="outline" 
-                  className="ml-2 border-[#6cbc8b] text-[#6cbc8b] hover:bg-[#6cbc8b] hover:text-white"
+                  variant="ghost"
+                  size="icon" 
+                  className="text-[#3a4b3c] hover:text-red-500"
                   onClick={handleLogout}
                 >
-                  Logout
+                  <LogOut className="h-5 w-5" />
                 </Button>
               </div>
             ) : (
-              <>
+              <div className="flex items-center space-x-4">
                 <Button 
                   variant="ghost" 
-                  className="text-[#3a4b3c] hover:text-[#6cbc8b] hover:bg-white/20"
+                  className="text-[#3a4b3c] hover:text-[#6cbc8b]"
                   onClick={handleLogin}
                 >
                   Login
                 </Button>
                 <Button 
-                  className="bg-[#3a4b3c] text-white hover:bg-[#4e6a56] transition-colors"
+                  className="bg-[#3a4b3c] text-white hover:bg-[#4e6a56]"
                   onClick={handleRegister}
                 >
                   Register
                 </Button>
-              </>
+              </div>
             )}
           </div>
 
@@ -216,12 +228,20 @@ export default function Header() {
             >
               About
             </Link>
+            <Link 
+              to="/contact" 
+              className="text-[#3a4b3c] hover:text-[#6cbc8b] font-medium py-2 transition-colors"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Contact
+            </Link>
             
             <div className="pt-4 border-t border-[#6cbc8b]/10">
               {loading ? (
-                <div className="w-8 h-8 rounded-full bg-[#e2f8e5] animate-pulse"></div>
-              ) : modelUser ? (
+                <div className="w-8 h-8 rounded-full bg-[#e2f8e5] animate-pulse" />
+              ) : isAuthenticated() ? (
                 <div className="flex flex-col space-y-3">
+                  <NotificationDropdown />
                   <Button 
                     variant="ghost" 
                     className="justify-start text-[#3a4b3c] hover:text-[#6cbc8b] hover:bg-white/20"
@@ -234,14 +254,15 @@ export default function Header() {
                     <span>Profile</span>
                   </Button>
                   <Button 
-                    variant="outline" 
-                    className="border-[#6cbc8b] text-[#6cbc8b] hover:bg-[#6cbc8b] hover:text-white"
+                    variant="ghost"
+                    className="justify-start text-[#3a4b3c] hover:text-red-500"
                     onClick={() => {
                       handleLogout();
                       setIsMenuOpen(false);
                     }}
                   >
-                    Logout
+                    <LogOut className="h-5 w-5 mr-2" />
+                    <span>Logout</span>
                   </Button>
                 </div>
               ) : (
@@ -250,7 +271,7 @@ export default function Header() {
                     variant="ghost" 
                     className="justify-start text-[#3a4b3c] hover:text-[#6cbc8b] hover:bg-white/20"
                     onClick={() => {
-                      handleLogin();
+                      navigate('/login');
                       setIsMenuOpen(false);
                     }}
                   >
@@ -259,7 +280,7 @@ export default function Header() {
                   <Button 
                     className="bg-[#3a4b3c] text-white hover:bg-[#4e6a56] transition-colors"
                     onClick={() => {
-                      handleRegister();
+                      navigate('/register');
                       setIsMenuOpen(false);
                     }}
                   >

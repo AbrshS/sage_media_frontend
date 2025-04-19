@@ -429,10 +429,10 @@ export default function FeaturedModels() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            onClick={() => navigate('/models')}
+            onClick={() => navigate('/leaderboard')}
             className="inline-flex items-center gap-2 px-8 py-4 bg-[#1E3A29] text-white rounded-full hover:bg-[#0A1F14] transition-all duration-300 font-medium shadow-lg"
           >
-            <span>Explore All Models</span>
+            <span>Explore More...</span>
             <ChevronRight className="w-4 h-4" />
           </motion.button>
         </div>

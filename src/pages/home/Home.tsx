@@ -16,7 +16,7 @@ export default function Home() {
   return (
     <div>
       <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
-        <Header />
+      
         <HeroSection />
         <HowItWorks />
         <CompetitionSection /> {/* This should now use the updated component */}

@@ -1,12 +1,105 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, Phone, MapPin, Send } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, Check } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import axios from 'axios';
 
 export default function Contact() {
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phoneNumber: '',
+    subject: '',
+    message: '',
+    policyAgreement: false
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleCheckbox = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData(prev => ({
+      ...prev,
+      policyAgreement: e.target.checked
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    setSuccess('');
+
+    try {
+      const response = await axios.post('http://localhost:3000/api/contact', formData);
+      setShowSuccessDialog(true);
+      setFormData({
+        firstName: '',
+        lastName: '',
+        email: '',
+        phoneNumber: '',
+        subject: '',
+        message: '',
+        policyAgreement: false
+      });
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Add this before the return statement
+  const SuccessDialog = () => (
+    <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
+      <DialogContent className="sm:max-w-md bg-white">
+        <DialogHeader>
+          <div className="w-12 h-12 rounded-full bg-green-100 mx-auto flex items-center justify-center mb-4">
+            <Check className="h-6 w-6 text-green-600" />
+          </div>
+          <DialogTitle className="text-center text-xl font-semibold text-[#344c3d]">
+            Message Sent Successfully!
+          </DialogTitle>
+          <DialogDescription className="text-center text-[#49695c]">
+            Thank you for reaching out. We have received your message and will get back to you within 24 hours.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="flex justify-center mt-4">
+          <Button
+            onClick={() => setShowSuccessDialog(false)}
+            className="bg-[#344c3d] hover:bg-[#49695c] text-white"
+          >
+            Close
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+
   return (
     <div className="min-h-screen bg-white py-20 px-4">
+      {/* Add the SuccessDialog component right after the opening div */}
+      <SuccessDialog />
+      
       <div className="max-w-7xl mx-auto relative">
         {/* Decorative elements */}
         <div className="absolute -top-10 right-10 w-40 h-40 rounded-full border border-[#344c3d]/10 hidden lg:block"></div>
@@ -130,19 +223,27 @@ export default function Contact() {
                     </p>
                   </div>
                   
-                  <form className="space-y-6">
+                  <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-[#344c3d]">First Name</label>
                         <Input 
+                          name="firstName"
+                          value={formData.firstName}
+                          onChange={handleChange}
                           placeholder="John"
+                          required
                           className="h-14 rounded-lg border-[#aee0ae]/50 focus:border-[#6b8e6e] focus:ring-[#6b8e6e]/20 bg-white" 
                         />
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-[#344c3d]">Last Name</label>
                         <Input 
+                          name="lastName"
+                          value={formData.lastName}
+                          onChange={handleChange}
                           placeholder="Doe"
+                          required
                           className="h-14 rounded-lg border-[#aee0ae]/50 focus:border-[#6b8e6e] focus:ring-[#6b8e6e]/20 bg-white" 
                         />
                       </div>
@@ -152,15 +253,23 @@ export default function Contact() {
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-[#344c3d]">Email Address</label>
                         <Input 
+                          name="email"
                           type="email"
+                          value={formData.email}
+                          onChange={handleChange}
                           placeholder="john@example.com"
+                          required
                           className="h-14 rounded-lg border-[#aee0ae]/50 focus:border-[#6b8e6e] focus:ring-[#6b8e6e]/20 bg-white" 
                         />
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-[#344c3d]">Phone Number</label>
                         <Input 
+                          name="phoneNumber"
+                          value={formData.phoneNumber}
+                          onChange={handleChange}
                           placeholder="+1 (555) 000-0000"
+                          required
                           className="h-14 rounded-lg border-[#aee0ae]/50 focus:border-[#6b8e6e] focus:ring-[#6b8e6e]/20 bg-white" 
                         />
                       </div>
@@ -169,7 +278,11 @@ export default function Contact() {
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-[#344c3d]">Subject</label>
                       <Input 
+                        name="subject"
+                        value={formData.subject}
+                        onChange={handleChange}
                         placeholder="How can we help you?"
+                        required
                         className="h-14 rounded-lg border-[#aee0ae]/50 focus:border-[#6b8e6e] focus:ring-[#6b8e6e]/20 bg-white" 
                       />
                     </div>
@@ -177,7 +290,11 @@ export default function Contact() {
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-[#344c3d]">Message</label>
                       <Textarea 
+                        name="message"
+                        value={formData.message}
+                        onChange={handleChange}
                         placeholder="Please provide details about your inquiry..."
+                        required
                         className="min-h-[200px] rounded-lg border-[#aee0ae]/50 focus:border-[#6b8e6e] focus:ring-[#6b8e6e]/20 bg-white resize-none" 
                       />
                     </div>
@@ -186,7 +303,11 @@ export default function Contact() {
                       <div className="flex items-center h-5">
                         <input
                           id="privacy"
+                          name="policyAgreement"
                           type="checkbox"
+                          checked={formData.policyAgreement}
+                          onChange={handleCheckbox}
+                          required
                           className="w-4 h-4 border-[#aee0ae]/50 rounded focus:ring-[#6b8e6e]"
                         />
                       </div>
