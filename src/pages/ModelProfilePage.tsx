@@ -508,6 +508,10 @@ const ModelProfilePage = () => {
     }
   };
 
+  function handleTabChange(arg0: string): void {
+    throw new Error('Function not implemented.');
+  }
+
   return (
     <div className="bg-gradient-to-b from-white to-gray-50 min-h-screen font-['Poppins',sans-serif]">
       {/* Header component would go here */}

@@ -1,7 +1,5 @@
-import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { ArrowRight, Check, Award, Camera, Globe, Sparkles, Star } from "lucide-react";
-
+import { Camera, Globe, Award, ArrowRight } from "lucide-react";
 
 export default function HowItWorks() {
   const steps = [
@@ -26,118 +24,132 @@ export default function HowItWorks() {
   ];
 
   return (
-    <><div className="w-full py-24 bg-white overflow-hidden">
-      <div className="container mx-auto px-4 relative">
-        {/* Enhanced decorative elements */}
-        <motion.div
-          className="absolute -top-40 -right-40 w-96 h-96 rounded-full border border-[#6cbc8b]/10"
-          animate={{ rotate: 360 }}
-          transition={{ duration: 100, repeat: Infinity, ease: "linear" }} />
-        <motion.div
-          className="absolute -bottom-40 -left-40 w-96 h-96 rounded-full border border-[#3a4b3c]/10"
-          animate={{ rotate: -360 }}
-          transition={{ duration: 120, repeat: Infinity, ease: "linear" }} />
-
-        {/* Refined Header */}
-        <div className="text-center mb-24 relative">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-            className="inline-flex items-center mb-4 px-5 py-2 bg-[#3a4b3c]/5 rounded-full border border-[#3a4b3c]/10"
-          >
-            <Sparkles className="w-4 h-4 text-[#6cbc8b] mr-2" />
-            <span className="text-[#3a4b3c] font-medium text-sm">Global Fashion Platform</span>
-          </motion.div>
-
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            viewport={{ once: true }}
-            className="text-5xl md:text-6xl font-bold mb-6 tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-[#3a4b3c] via-[#6cbc8b] to-[#3a4b3c]"
-            style={{ fontFamily: "'Clash Display', sans-serif" }}
-          >
-            Your Path to Global Success
-          </motion.h2>
-
-          <motion.div
-            initial={{ scaleX: 0 }}
-            whileInView={{ scaleX: 1 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            viewport={{ once: true }}
-            className="h-[2px] w-32 bg-gradient-to-r from-[#3a4b3c]/20 via-[#6cbc8b] to-[#3a4b3c]/20 mx-auto mb-8" />
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
-            viewport={{ once: true }}
-            className="text-[#4e6a56] max-w-3xl mx-auto text-lg leading-relaxed"
-          >
-            Experience a revolutionary platform that transforms African modeling talent into
-            global fashion icons through our innovative, internationally-recognized process
-          </motion.p>
-        </div>
-
+    <section className="w-full py-24 bg-white relative overflow-hidden">
+      {/* Unique background pattern - diagonal stripes */}
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute inset-0" style={{ 
+          backgroundImage: 'repeating-linear-gradient(45deg, #344c3d, #344c3d 1px, transparent 1px, transparent 10px)',
+          backgroundSize: '20px 20px'
+        }}></div>
       </div>
-    </div>
-    <div className="w-full py-20 overflow-hidden relative -mt-10">
-        {/* Subtle gradient background */}
-        <div className="absolute inset-0 bg-gradient-to-r from-white via-[#e2f8e5]/30 to-white z-0"></div>
-
-        <div className="container mx-auto px-4 relative z-10">
-          {/* Simple header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-3xl font-bold text-[#3a4b3c] mb-4">
+      
+      {/* Floating elements */}
+      <div className="absolute top-20 left-10 w-16 h-16 rounded-full bg-[#344c3d]/5 animate-float-slow hidden lg:block"></div>
+      <div className="absolute bottom-20 right-10 w-24 h-24 rounded-full bg-[#344c3d]/5 animate-float-medium hidden lg:block"></div>
+      <div className="absolute top-1/2 right-1/4 w-12 h-12 rounded-full bg-[#344c3d]/5 animate-float-fast hidden lg:block"></div>
+      
+      <div className="container mx-auto px-4 relative z-10">
+        {/* Header with unique style */}
+        <div className="text-center mb-20">
+          <div className="inline-block mb-4 relative">
+            <span className="absolute -inset-1 rounded-lg bg-[#344c3d]/10 transform -rotate-1"></span>
+            <h2 className="relative text-3xl md:text-4xl font-bold text-[#344c3d] px-6 py-2">
               How It Works
             </h2>
-            <div className="h-1 w-20 bg-[#6cbc8b] mx-auto"></div>
-          </motion.div>
-
-          {/* Horizontal steps layout */}
-          <div className="flex flex-col md:flex-row justify-between items-start gap-8 relative">
-            {/* Connecting line */}
-            <div className="absolute top-12 left-0 w-full h-[2px] bg-[#97d8a6]/30 hidden md:block"></div>
-
-            {steps.map((step, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.2 }}
-                className="flex-1 relative bg-white rounded-xl p-6 shadow-sm border border-[#97d8a6]/20 md:max-w-[32%]"
-              >
-                {/* Step number */}
-                <div className="absolute -top-5 left-1/2 transform -translate-x-1/2 bg-[#3a4b3c] text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg z-10">
+          </div>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            Our innovative platform transforms African modeling talent into global fashion icons through a simple yet powerful process
+          </p>
+        </div>
+        
+        {/* Unique vertical timeline with offset cards */}
+        <div className="relative max-w-4xl mx-auto">
+          {/* Center line */}
+          <div className="absolute left-1/2 transform -translate-x-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-[#344c3d]/0 via-[#344c3d]/30 to-[#344c3d]/0"></div>
+          
+          {steps.map((step, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: index * 0.2 }}
+              className={`relative mb-20 md:mb-32 ${index === steps.length - 1 ? 'mb-0' : ''}`}
+            >
+              <div className={`flex flex-col md:flex-row items-center ${index % 2 === 0 ? 'md:flex-row-reverse' : ''}`}>
+                {/* Step number in circle */}
+                <div className="absolute left-1/2 transform -translate-x-1/2 z-20 w-12 h-12 rounded-full bg-white border-4 border-[#344c3d] flex items-center justify-center font-bold text-[#344c3d]">
                   {step.number}
                 </div>
-
-                {/* Icon */}
-                <div className="mb-6 text-center pt-4">
-                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[#e2f8e5] text-[#3a4b3c]">
-                    {step.icon}
+                
+                {/* Content card with unique shape */}
+                <div className={`w-full md:w-[calc(50%-2rem)] bg-white p-6 rounded-lg shadow-md relative ${
+                  index % 2 === 0 ? 'md:mr-auto' : 'md:ml-auto'
+                }`}>
+                  {/* Triangle pointer */}
+                  <div className={`absolute top-4 ${
+                    index % 2 === 0 ? 'left-full md:left-auto md:right-full' : 'right-full'
+                  } transform ${
+                    index % 2 === 0 ? 'rotate-90 md:rotate-0 md:-scale-x-100' : '-rotate-90 md:rotate-0'
+                  } hidden md:block`}>
+                    <div className="w-0 h-0 border-y-8 border-y-transparent border-r-[16px] border-r-white"></div>
+                  </div>
+                  
+                  {/* Card content with unique styling */}
+                  <div className="flex flex-col items-center md:items-start text-center md:text-left">
+                    <div className="mb-4 w-16 h-16 rounded-lg bg-[#344c3d]/10 flex items-center justify-center text-[#344c3d]">
+                      {step.icon}
+                    </div>
+                    <h3 className="text-xl font-bold text-[#344c3d] mb-2">{step.title}</h3>
+                    <p className="text-gray-600">{step.description}</p>
+                    
+                    {/* Unique animated arrow for each step */}
+                    {index < steps.length - 1 && (
+                      <div className="mt-4 text-[#344c3d]">
+                        <motion.div
+                          animate={{ x: [0, 5, 0] }}
+                          transition={{ repeat: Infinity, duration: 1.5 }}
+                        >
+                          <ArrowRight className="w-5 h-5" />
+                        </motion.div>
+                      </div>
+                    )}
                   </div>
                 </div>
-
-                {/* Content */}
-                <h3 className="text-xl font-bold text-[#3a4b3c] mb-3 text-center">
-                  {step.title}
-                </h3>
-                <p className="text-[#4e6a56] text-center">
-                  {step.description}
-                </p>
-              </motion.div>
-            ))}
-          </div>
+              </div>
+            </motion.div>
+          ))}
         </div>
-      </div></>
+        
+        {/* Call to action */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.6 }}
+          className="text-center mt-16"
+        >
+          <a href="/register" className="inline-flex items-center gap-2 px-6 py-3 bg-[#344c3d] text-white rounded-md hover:bg-[#2a3e31] transition-colors">
+            <span>Start Your Journey</span>
+            <ArrowRight className="w-4 h-4" />
+          </a>
+        </motion.div>
+      </div>
+      
+      {/* Add the required animations to the global CSS */}
+      <style jsx global>{`
+        @keyframes float-slow {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-15px); }
+        }
+        @keyframes float-medium {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-10px); }
+        }
+        @keyframes float-fast {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-5px); }
+        }
+        .animate-float-slow {
+          animation: float-slow 7s ease-in-out infinite;
+        }
+        .animate-float-medium {
+          animation: float-medium 5s ease-in-out infinite;
+        }
+        .animate-float-fast {
+          animation: float-fast 3s ease-in-out infinite;
+        }
+      `}</style>
+    </section>
   );
 }

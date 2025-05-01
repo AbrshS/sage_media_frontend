@@ -1,12 +1,12 @@
 import { useState, useRef, useEffect } from "react";
-import { motion, useMotionValue, useSpring } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Clock, Ticket, Star, Crown, Sparkles } from "lucide-react";
+import { ArrowRight, Clock, Star, Crown, Sparkles, ChevronDown, Instagram, Camera, Award, Users, Globe, Facebook, Twitter as TwitterIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export default function HeroSection() {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
+  const [activeCategory, setActiveCategory] = useState(0);
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -14,15 +14,22 @@ export default function HeroSection() {
     seconds: 0
   });
   
-  // Spring animation for smoother cursor tracking
-  const cursorX = useMotionValue(0);
-  const cursorY = useMotionValue(0);
-  const springX = useSpring(cursorX, { damping: 25, stiffness: 100 });
-  const springY = useSpring(cursorY, { damping: 25, stiffness: 100 });
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  
+  const rotateX = useTransform(mouseY, [0, 300], [5, -5]);
+  const rotateY = useTransform(mouseX, [0, 300], [-5, 5]);
+  
+  const categories = [
+    { name: "Fashion", icon: <Camera className="w-4 h-4" />, color: "#344c3d" },
+    { name: "Runway", icon: <Crown className="w-4 h-4" />, color: "#6cbc8b" },
+    { name: "Commercial", icon: <Award className="w-4 h-4" />, color: "#344c3d" },
+    { name: "Fitness", icon: <Users className="w-4 h-4" />, color: "#6cbc8b" },
+    { name: "Editorial", icon: <Globe className="w-4 h-4" />, color: "#344c3d" },
+  ];
 
   // Countdown timer
   useEffect(() => {
-    // Set end date to 30 days from now for demo
     const endDate = new Date();
     endDate.setDate(endDate.getDate() + 30);
     
@@ -46,15 +53,13 @@ export default function HeroSection() {
     return () => clearInterval(timer);
   }, []);
 
+  // Mouse move effect
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (containerRef.current) {
         const rect = containerRef.current.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        setMousePosition({ x, y });
-        cursorX.set(x);
-        cursorY.set(y);
+        mouseX.set(e.clientX - rect.left);
+        mouseY.set(e.clientY - rect.top);
       }
     };
 
@@ -68,205 +73,79 @@ export default function HeroSection() {
         container.removeEventListener("mousemove", handleMouseMove);
       }
     };
-  }, [cursorX, cursorY]);
+  }, [mouseX, mouseY]);
+
+  // Auto-rotate categories
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveCategory(prev => (prev + 1) % categories.length);
+    }, 3000);
+    
+    return () => clearInterval(interval);
+  }, [categories.length]);
 
   // Calculate progress percentage for countdown
-  const totalDays = 30; // Total campaign days
+  const totalDays = 30;
   const progressPercentage = ((totalDays - timeLeft.days) / totalDays) * 100;
 
   return (
     <div 
       ref={containerRef} 
-      className="w-full min-h-screen relative bg-gradient-to-b from-white to-[#f8f5f0] overflow-hidden"
+      className="w-full min-h-screen relative overflow-hidden bg-[#f9f9f7]"
     >
-      {/* Background elements */}
+      {/* Dynamic background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {/* Elegant accent lines */}
-        <motion.div 
-          className="absolute top-[15%] left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#6cbc8b]/30 to-transparent"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5, duration: 1.5 }}
-        />
-        <motion.div 
-          className="absolute top-[85%] left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#3a4b3c]/20 to-transparent"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.7, duration: 1.5 }}
-        />
+        {/* Animated gradient background */}
+        <div className="absolute inset-0 opacity-10 bg-gradient-to-br from-[#344c3d]/10 via-white to-[#6cbc8b]/10"></div>
         
-        {/* Decorative circles */}
-        <motion.div 
-          className="absolute -top-[300px] -right-[300px] w-[600px] h-[600px] opacity-5"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.05 }}
-          transition={{ duration: 2 }}
-        >
-          <div className="w-full h-full border-[40px] border-[#3a4b3c] rounded-full" />
-        </motion.div>
+        {/* Grid pattern */}
+        <div className="absolute inset-0 opacity-5" style={{ 
+          backgroundImage: 'linear-gradient(to right, #344c3d 1px, transparent 1px), linear-gradient(to bottom, #344c3d 1px, transparent 1px)',
+          backgroundSize: '40px 40px'
+        }}></div>
         
-        <motion.div 
-          className="absolute -bottom-[300px] -left-[300px] w-[600px] h-[600px] opacity-5"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.05 }}
-          transition={{ duration: 2 }}
-        >
-          <div className="w-full h-full border-[40px] border-[#6cbc8b] rounded-full" />
-        </motion.div>
-        
-        {/* Subtle sparkle elements */}
-        {[...Array(12)].map((_, i) => (
+        {/* Floating elements */}
+        {[...Array(15)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute"
-            initial={{
+            className="absolute rounded-full"
+            style={{
+              width: Math.random() * 100 + 50,
+              height: Math.random() * 100 + 50,
               x: `${Math.random() * 100}%`,
               y: `${Math.random() * 100}%`,
-              scale: 0,
-              opacity: 0
+              background: i % 2 === 0 ? 'radial-gradient(circle, rgba(52,76,61,0.05) 0%, rgba(52,76,61,0) 70%)' : 
+                                        'radial-gradient(circle, rgba(108,188,139,0.05) 0%, rgba(108,188,139,0) 70%)'
             }}
             animate={{
-              scale: [0, 1, 0],
-              opacity: [0, 0.8, 0]
+              y: [`${Math.random() * 100}%`, `${Math.random() * 100}%`],
+              x: [`${Math.random() * 100}%`, `${Math.random() * 100}%`],
+              scale: [1, 1.2, 1],
             }}
             transition={{
-              duration: 4,
-              delay: i * 1.5,
+              duration: 20 + Math.random() * 10,
               repeat: Infinity,
-              repeatDelay: Math.random() * 10 + 8
+              repeatType: "reverse",
             }}
-          >
-            <Sparkles className="text-[#6cbc8b]" size={Math.random() * 16 + 8} />
-          </motion.div>
+          />
         ))}
       </div>
       
-      {/* Cursor follower */}
-      <motion.div 
-        className="pointer-events-none absolute z-0 rounded-full opacity-10 bg-[#6cbc8b] blur-3xl"
-        style={{
-          x: springX,
-          y: springY,
-          width: 300,
-          height: 300,
-          transform: "translate(-50%, -50%)"
-        }}
-      />
-      
       {/* Main content */}
-      <div className="container mx-auto px-4 pt-32 pb-20 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+      <div className="container mx-auto px-4 py-12 md:py-20 lg:py-28 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           {/* Left column - Main content */}
-          <div className="max-w-xl">
-            {/* Premium badge */}
+          <div className="lg:col-span-6 xl:col-span-5">
+            {/* Social proof bar */}
             <motion.div
-              initial={{ opacity: 0, y: -20 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="inline-flex items-center px-4 py-2 rounded-full bg-white/80 backdrop-blur-sm border border-[#6cbc8b]/30 shadow-sm mb-8"
+              className="flex items-center gap-3 mb-8 bg-white/80 backdrop-blur-sm rounded-full py-2 px-4 shadow-sm border border-[#344c3d]/10 w-fit"
             >
-              <Crown className="h-4 w-4 text-[#6cbc8b] mr-2" />
-              <span className="text-[#3a4b3c] font-medium">Premium Modeling Competition</span>
-            </motion.div>
-            
-            {/* Main headline */}
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="text-5xl md:text-7xl font-extrabold mb-6 tracking-tight leading-tight"
-              style={{ 
-                fontFamily: "'Clash Display', sans-serif",
-                background: "linear-gradient(to right, #3a4b3c, #6cbc8b, #3a4b3c)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundSize: "200% auto",
-                animation: "textShine 3s linear infinite"
-              }}
-            >
-              Africa's Premier <br />
-              <span>Modeling Competition</span>
-            </motion.h1>
-            
-            {/* Elegant divider */}
-            <motion.div
-              initial={{ scaleX: 0 }}
-              animate={{ scaleX: 1 }}
-              transition={{ delay: 0.5, duration: 1 }}
-              className="h-[2px] w-32 bg-gradient-to-r from-[#3a4b3c]/20 via-[#6cbc8b] to-[#3a4b3c]/20 mb-8"
-            />
-            
-            {/* Subheadline */}
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-              className="text-xl text-[#4e6a56] mb-10 font-light leading-relaxed"
-            >
-              Showcase your talent, gain international exposure, and win career-changing opportunities with Africa's most prestigious modeling platform
-            </motion.p>
-            
-            {/* Stats row */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7 }}
-              className="flex flex-wrap gap-8 mb-10"
-            >
-              {[
-                { value: "1,234+", label: "Models Entered" },
-                { value: "$50,000", label: "Prize Pool" },
-                { value: "35+", label: "Countries" }
-              ].map((stat, index) => (
-                <div key={index} className="text-center">
-                  <div 
-                    className="text-3xl font-bold text-[#3a4b3c] mb-1"
-                    style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-                  >
-                    {stat.value}
-                  </div>
-                  <div className="text-sm text-[#4e6a56] uppercase tracking-wider">{stat.label}</div>
-                </div>
-              ))}
-            </motion.div>
-            
-            {/* CTA buttons with luxury styling */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8 }}
-              className="flex flex-col sm:flex-row gap-4 mb-10"
-            >
-              <Button 
-                className="bg-[#3a4b3c] hover:bg-[#4e6a56] text-white text-lg px-8 py-6 rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl hover:shadow-[#6cbc8b]/20"
-                asChild
-              >
-                <Link to="/competitions">
-                  Enter Competition
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
-              <Button 
-                variant="outline" 
-                className="border-2 border-[#4e6a56] text-[#4e6a56] hover:bg-[#4e6a56] hover:text-white text-lg px-8 py-6 rounded-xl transition-all duration-300"
-                asChild
-              >
-                <Link to="/leaderboard">
-                  View Leaderboard
-                </Link>
-              </Button>
-            </motion.div>
-            
-            {/* Testimonial for social proof */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.9 }}
-              className="flex items-center bg-white/50 backdrop-blur-sm rounded-xl p-4 border border-[#6cbc8b]/10"
-            >
-              <div className="flex -space-x-3 mr-4">
-                {[...Array(4)].map((_, i) => (
-                  <div key={i} className="w-10 h-10 rounded-full border-2 border-white overflow-hidden">
+              <div className="flex -space-x-2">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="w-6 h-6 rounded-full border-2 border-white overflow-hidden">
                     <img 
                       src={`/images/model-${i+1}.jpg`} 
                       alt="Model" 
@@ -278,118 +157,377 @@ export default function HeroSection() {
                   </div>
                 ))}
               </div>
-              <div>
-                <div className="flex items-center mb-1">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-3 w-3 text-[#6cbc8b] fill-[#6cbc8b]" />
-                  ))}
-                </div>
-                <p className="text-sm text-[#4e6a56]">
-                  <span className="font-medium">230+ models</span> joined in the last 24 hours
-                </p>
+              <div className="flex items-center gap-1">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="h-3 w-3 text-[#344c3d] fill-[#344c3d]" />
+                ))}
               </div>
+              <span className="text-xs font-medium text-[#344c3d]">
+                <span className="font-bold">230+</span> joined today
+              </span>
             </motion.div>
-          </div>
-          
-          {/* Right column - Countdown and image */}
-          <div>
-            {/* Countdown timer with luxury styling */}
+            
+            {/* Animated category selector */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1 }}
-              className="bg-white rounded-2xl p-8 shadow-[0_10px_50px_-12px_rgba(108,188,139,0.25)] border border-[#6cbc8b]/10 mb-8 relative z-10"
+              transition={{ delay: 0.3 }}
+              className="mb-6"
             >
-              <div className="flex items-center mb-6">
-                <div className="w-12 h-12 rounded-full bg-[#3a4b3c]/5 flex items-center justify-center mr-4">
-                  <Clock className="text-[#3a4b3c] h-6 w-6" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-[#3a4b3c]">Competition Closes In:</h3>
-                  <p className="text-sm text-[#4e6a56]">Don't miss your opportunity to showcase your talent</p>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-4 gap-4 mb-8">
-                {[
-                  { value: timeLeft.days, label: "Days" },
-                  { value: timeLeft.hours, label: "Hours" },
-                  { value: timeLeft.minutes, label: "Minutes" },
-                  { value: timeLeft.seconds, label: "Seconds" }
-                ].map((item, index) => (
-                  <div key={index} className="text-center">
-                    <div className="bg-[#f7f9f7] rounded-xl p-4 border border-[#6cbc8b]/10">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-sm font-medium text-[#344c3d]/70">Categories:</span>
+                <div className="relative h-8 overflow-hidden">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={activeCategory}
+                      initial={{ y: 30, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      exit={{ y: -30, opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="absolute"
+                    >
                       <div 
-                        className="text-4xl font-bold text-[#3a4b3c] mb-1"
-                        style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                        className="flex items-center gap-1.5 px-3 py-1 rounded-full"
+                        style={{ backgroundColor: `${categories[activeCategory].color}10` }}
                       >
-                        {item.value < 10 ? `0${item.value}` : item.value}
+                        <div className="text-[#344c3d]">{categories[activeCategory].icon}</div>
+                        <span className="text-sm font-medium" style={{ color: categories[activeCategory].color }}>
+                          {categories[activeCategory].name}
+                        </span>
                       </div>
-                      <div className="text-xs text-[#4e6a56] uppercase tracking-wider">{item.label}</div>
-                    </div>
-                  </div>
-                ))}
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
               </div>
-              
-              {/* Progress bar */}
-              <div className="w-full h-1 bg-[#f7f9f7] rounded-full overflow-hidden mb-2">
-                <motion.div 
-                  className="h-full bg-gradient-to-r from-[#3a4b3c] to-[#6cbc8b] rounded-full"
+            </motion.div>
+            
+            {/* Main headline with animated gradient */}
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-[1.1]"
+            >
+              <span className="block">Discover Your</span>
+              <span className="relative">
+                <span className="relative z-10 bg-clip-text text-transparent bg-gradient-to-r from-[#344c3d] via-[#6cbc8b] to-[#344c3d] bg-[length:200%_auto] animate-gradient">
+                  Modeling Potential
+                </span>
+                <motion.span 
+                  className="absolute -bottom-2 left-0 h-3 bg-[#6cbc8b]/20 w-full rounded-sm z-0"
                   initial={{ width: 0 }}
-                  animate={{ width: `${progressPercentage}%` }}
-                  transition={{ duration: 1, delay: 1.2 }}
-                ></motion.div>
-              </div>
-              <div className="flex justify-between text-sm text-[#4e6a56] mb-6">
-                <span>Campaign Started</span>
-                <span>{Math.round(progressPercentage)}% Complete</span>
-              </div>
-              
-              {/* Quick apply button */}
+                  animate={{ width: "100%" }}
+                  transition={{ delay: 0.8, duration: 0.8 }}
+                />
+              </span>
+            </motion.h1>
+            
+            {/* Subheadline */}
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="text-lg text-[#344c3d]/80 mb-8 max-w-lg"
+            >
+              Join Africa's premier modeling competition platform. Showcase your talent, connect with top agencies, and launch your international career.
+            </motion.p>
+            
+            {/* Stats with animated counters */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+              className="grid grid-cols-3 gap-4 mb-8"
+            >
+              {[
+                { icon: <Users className="w-5 h-5" />, value: "1,234+", label: "Models" },
+                { icon: <Award className="w-5 h-5" />, value: "$50K", label: "Prizes" },
+                { icon: <Globe className="w-5 h-5" />, value: "35+", label: "Countries" }
+              ].map((stat, index) => (
+                <motion.div 
+                  key={index}
+                  whileHover={{ y: -5 }}
+                  className="bg-white rounded-xl p-4 shadow-sm border border-[#344c3d]/10 text-center"
+                >
+                  <div className="w-10 h-10 rounded-full bg-[#344c3d]/5 flex items-center justify-center mx-auto mb-2 text-[#344c3d]">
+                    {stat.icon}
+                  </div>
+                  <div className="text-xl font-bold text-[#344c3d]">{stat.value}</div>
+                  <div className="text-xs text-[#344c3d]/70 uppercase tracking-wider">{stat.label}</div>
+                </motion.div>
+              ))}
+            </motion.div>
+            
+            {/* CTA buttons */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7 }}
+              className="flex flex-col sm:flex-row gap-4 mb-8"
+            >
               <Button 
-                className="w-full bg-[#3a4b3c] hover:bg-[#4e6a56] text-white text-lg py-5 rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl hover:shadow-[#6cbc8b]/20"
+                className="bg-[#344c3d] hover:bg-[#2a3e31] text-white px-8 py-6 rounded-xl shadow-md transition-all duration-300 hover:shadow-lg hover:shadow-[#344c3d]/20 group relative overflow-hidden"
                 asChild
               >
                 <Link to="/competitions">
-                  Apply Now
-                  <ArrowRight className="ml-2 h-5 w-5" />
+                  <span className="relative z-10 flex items-center">
+                    Enter Competition
+                    <motion.div
+                      animate={{ x: [0, 5, 0] }}
+                      transition={{ repeat: Infinity, duration: 1.5 }}
+                      className="ml-2"
+                    >
+                      <ArrowRight className="h-5 w-5" />
+                    </motion.div>
+                  </span>
+                  <span className="absolute inset-0 bg-[#6cbc8b] translate-y-full group-hover:translate-y-0 transition-transform duration-300"></span>
+                </Link>
+              </Button>
+              
+              <Button 
+                variant="outline" 
+                className="border-2 border-[#344c3d] text-[#344c3d] hover:bg-[#344c3d] hover:text-white px-8 py-6 rounded-xl transition-all duration-300"
+                asChild
+              >
+                <Link to="/leaderboard">
+                  View Leaderboard
                 </Link>
               </Button>
             </motion.div>
             
-            {/* Featured model image */}
+            {/* Social media integration */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 1.2, duration: 0.8 }}
-              className="relative rounded-2xl overflow-hidden shadow-2xl border-4 border-white"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8 }}
+              className="flex items-center gap-4"
             >
-              <img 
-                src="/images/featured-model.jpg" 
-                alt="Featured Model" 
-                className="w-full h-[500px] object-cover"
-                onError={(e) => {
-                  e.currentTarget.src = "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80";
-                }}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex flex-col justify-end p-6">
-                <div className="inline-flex items-center px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 mb-3 w-fit">
-                  <Crown className="h-3 w-3 text-white mr-1" />
-                  <span className="text-white text-xs font-medium">2023 Winner</span>
-                </div>
-                <h3 className="text-2xl font-bold text-white mb-1">Amara Kente</h3>
-                <p className="text-white/80 text-sm">International Model & Brand Ambassador</p>
-              </div>
+              <span className="text-sm text-[#344c3d]/70">Follow us:</span>
+              {[Instagram, TwitterIcon, Facebook].map((Icon, index) => (
+                <a 
+                  key={index}
+                  href="#" 
+                  className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm border border-[#344c3d]/10 text-[#344c3d] hover:bg-[#344c3d] hover:text-white transition-colors"
+                >
+                  <Icon className="w-4 h-4" />
+                </a>
+              ))}
             </motion.div>
           </div>
+          
+          {/* Right column - 3D card and countdown */}
+          <div className="lg:col-span-6 xl:col-span-7">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* 3D Model Card */}
+              <motion.div
+                style={{ 
+                  rotateX: rotateX,
+                  rotateY: rotateY,
+                  transformStyle: "preserve-3d",
+                  perspective: 1000
+                }}
+                className="md:col-span-2 lg:col-span-1 h-[500px] md:h-[400px] lg:h-[500px] rounded-2xl overflow-hidden shadow-xl relative"
+              >
+                <motion.div
+                  initial={{ scale: 1.1, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.4, duration: 0.8 }}
+                  className="absolute inset-0"
+                >
+                  <img 
+                    src="/images/featured-model.jpg" 
+                    alt="Featured Model" 
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e";
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#344c3d]/90 via-transparent to-transparent"></div>
+                  
+                  {/* Social media style overlay */}
+                  <div className="absolute inset-0 p-6 flex flex-col justify-between">
+                    <div className="flex justify-between">
+                      <div className="bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 text-white text-xs font-medium flex items-center">
+                        <Crown className="w-3 h-3 mr-1" />
+                        Featured Model
+                      </div>
+                      <div className="bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 text-white text-xs font-medium flex items-center">
+                        <Star className="w-3 h-3 mr-1 fill-white" />
+                        4.9
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-12 h-12 rounded-full border-2 border-white overflow-hidden">
+                          <img 
+                            src="/images/model-avatar.jpg" 
+                            alt="Model Avatar" 
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.currentTarget.src = "https://randomuser.me/api/portraits/women/44.jpg";
+                            }}
+                          />
+                        </div>
+                        <div>
+                          <h3 className="text-white font-bold text-lg">Amara Kente</h3>
+                          <p className="text-white/80 text-xs">@amarakente • Fashion Model</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex gap-2">
+                        <Button 
+                          className="bg-white text-[#344c3d] hover:bg-white/90 text-sm px-4 py-2 rounded-lg flex-1"
+                        >
+                          View Profile
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          className="border-white text-white hover:bg-white/20 text-sm px-4 py-2 rounded-lg"
+                        >
+                          Vote
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              </motion.div>
+              
+              {/* Countdown and competition info */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6 }}
+                className="bg-white rounded-2xl p-6 shadow-lg border border-[#344c3d]/10 flex flex-col justify-between h-full"
+              >
+                <div>
+                  <div className="flex items-center mb-4">
+                    <div className="w-10 h-10 rounded-full bg-[#344c3d]/10 flex items-center justify-center mr-3 text-[#344c3d]">
+                      <Clock className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-[#344c3d] font-bold">Competition Ends In:</h3>
+                      <p className="text-xs text-[#344c3d]/70">Don't miss your opportunity</p>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-4 gap-2 mb-4">
+                    {[
+                      { value: timeLeft.days, label: "Days" },
+                      { value: timeLeft.hours, label: "Hours" },
+                      { value: timeLeft.minutes, label: "Min" },
+                      { value: timeLeft.seconds, label: "Sec" }
+                    ].map((item, index) => (
+                      <div key={index} className="text-center">
+                        <div className="bg-[#f7f9f7] rounded-lg p-2 border border-[#344c3d]/5">
+                          <div className="text-xl font-bold text-[#344c3d]">
+                            {item.value < 10 ? `0${item.value}` : item.value}
+                          </div>
+                          <div className="text-[10px] text-[#344c3d]/70 uppercase">{item.label}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {/* Progress bar */}
+                  <div className="w-full h-1.5 bg-[#f7f9f7] rounded-full overflow-hidden mb-2">
+                    <motion.div 
+                      className="h-full bg-gradient-to-r from-[#344c3d] to-[#6cbc8b] rounded-full"
+                      initial={{ width: 0 }}
+                      animate={{ width: `${progressPercentage}%` }}
+                      transition={{ duration: 1, delay: 0.8 }}
+                    ></motion.div>
+                  </div>
+                  <div className="flex justify-between text-xs text-[#344c3d]/70 mb-4">
+                    <span>Started</span>
+                    <span>{Math.round(progressPercentage)}% Complete</span>
+                  </div>
+                </div>
+                
+                <Button 
+                  className="w-full bg-[#344c3d] hover:bg-[#2a3e31] text-white py-4 rounded-xl shadow-md transition-all duration-300 hover:shadow-lg"
+                  asChild
+                >
+                  <Link to="/competitions">
+                    Apply Now
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+              </motion.div>
+              
+              {/* Categories showcase */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.7 }}
+                className="bg-white rounded-2xl p-6 shadow-lg border border-[#344c3d]/10"
+              >
+                <h3 className="text-[#344c3d] font-bold mb-4 flex items-center">
+                  <Award className="w-5 h-5 mr-2" />
+                  Competition Categories
+                </h3>
+                
+                <div className="space-y-3">
+                  {categories.map((category, index) => (
+                    <div 
+                      key={index}
+                      className="flex items-center justify-between p-3 rounded-lg hover:bg-[#344c3d]/5 transition-colors cursor-pointer"
+                    >
+                      <div className="flex items-center">
+                        <div 
+                          className="w-8 h-8 rounded-full flex items-center justify-center mr-3"
+                          style={{ backgroundColor: `${category.color}10` }}
+                        >
+                          <div className="text-[#344c3d]">{category.icon}</div>
+                        </div>
+                        <span className="font-medium text-[#344c3d]">{category.name}</span>
+                      </div>
+                      <ArrowRight className="w-4 h-4 text-[#344c3d]/50" />
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="mt-4 text-center">
+                  <Link to="/categories" className="text-sm text-[#344c3d] font-medium hover:text-[#6cbc8b] transition-colors inline-flex items-center">
+                    View all categories
+                    <ChevronDown className="w-4 h-4 ml-1" />
+                  </Link>
+                </div>
+              </motion.div>
+            </div>
+          </div>
         </div>
+        
+        {/* Scroll indicator */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.2 }}
+          className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center"
+        >
+          <span className="text-xs text-[#344c3d]/70 mb-2">Scroll to explore</span>
+          <motion.div
+            animate={{ y: [0, 10, 0] }}
+            transition={{ repeat: Infinity, duration: 1.5 }}
+            className="w-6 h-10 rounded-full border-2 border-[#344c3d]/30 flex items-center justify-center"
+          >
+            <motion.div
+              animate={{ y: [0, 5, 0] }}
+              transition={{ repeat: Infinity, duration: 1.5 }}
+              className="w-1.5 h-1.5 rounded-full bg-[#344c3d]"
+            />
+          </motion.div>
+        </motion.div>
       </div>
       
       {/* Add CSS for text gradient animation */}
       <style>{`
-        @keyframes textShine {
+        @keyframes gradient {
           0% { background-position: 0% center; }
           100% { background-position: 200% center; }
+        }
+        .animate-gradient {
+          animation: gradient 4s linear infinite;
         }
       `}</style>
     </div>

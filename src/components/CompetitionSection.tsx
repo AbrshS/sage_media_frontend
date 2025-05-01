@@ -72,24 +72,24 @@ const ErrorAlert = ({ message }: { message: string }) => (
   </motion.div>
 );
 
-// Status Badge Helper
+// Status Badge Helper - Updated for consistent color scheme
 const getStatusStyles = (status: string) => {
   switch(status) {
     case 'active':
       return {
-        bg: 'bg-gradient-to-r from-emerald-500 to-teal-500',
+        bg: 'bg-[#344c3d]',
         text: 'text-white',
         icon: <TrendingUp className="w-3 h-3 mr-1" />
       };
     case 'upcoming':
       return {
-        bg: 'bg-gradient-to-r from-amber-400 to-yellow-500',
+        bg: 'bg-amber-500',
         text: 'text-white',
         icon: <Calendar className="w-3 h-3 mr-1" />
       };
     default:
       return {
-        bg: 'bg-gradient-to-r from-gray-400 to-gray-500',
+        bg: 'bg-gray-500',
         text: 'text-white',
         icon: <Clock className="w-3 h-3 mr-1" />
       };
@@ -102,7 +102,8 @@ interface Props {
 }
 
 export default function CompetitionSection({ initialCompetition }: Props) {
-  // State
+  // State variables remain unchanged
+  
   const [competitions, setCompetitions] = useState<Competition[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -257,7 +258,7 @@ export default function CompetitionSection({ initialCompetition }: Props) {
     setSelectedCard(id === selectedCard ? null : id);
   };
 
-  // Render competition cards
+  // Render competition cards - Simplified design
   const renderCompetitionCards = () => {
     if (loading && competitions.length === 0) {
       return Array.from({ length: 3 }).map((_, index) => (
@@ -266,14 +267,14 @@ export default function CompetitionSection({ initialCompetition }: Props) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: index * 0.1 }}
-          className="bg-white rounded-3xl overflow-hidden border border-[#344c3d]/10 animate-pulse shadow-xl"
+          className="bg-white rounded-lg overflow-hidden border border-gray-200 shadow-sm animate-pulse"
         >
-          <div className="h-64 bg-[#344c3d]/5"></div>
+          <div className="h-64 bg-gray-100"></div>
           <div className="p-6 space-y-3">
-            <div className="h-6 bg-[#344c3d]/5 rounded-lg w-3/4"></div>
-            <div className="h-4 bg-[#344c3d]/5 rounded-lg w-full"></div>
-            <div className="h-4 bg-[#344c3d]/5 rounded-lg w-5/6"></div>
-            <div className="h-10 bg-[#344c3d]/5 rounded-lg w-full mt-4"></div>
+            <div className="h-6 bg-gray-100 rounded-lg w-3/4"></div>
+            <div className="h-4 bg-gray-100 rounded-lg w-full"></div>
+            <div className="h-4 bg-gray-100 rounded-lg w-5/6"></div>
+            <div className="h-10 bg-gray-100 rounded-lg w-full mt-4"></div>
           </div>
         </motion.div>
       ));
@@ -286,11 +287,11 @@ export default function CompetitionSection({ initialCompetition }: Props) {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5 }}
-            className="bg-white p-10 rounded-3xl shadow-xl max-w-lg mx-auto"
+            className="bg-white p-10 rounded-lg shadow-md max-w-lg mx-auto border border-gray-200"
           >
-            <Award className="w-16 h-16 text-[#344c3d]/30 mx-auto mb-6" />
-            <h3 className="text-2xl font-bold text-[#344c3d] mb-3">No Competitions Available</h3>
-            <p className="text-[#344c3d]/60">
+            <Award className="w-16 h-16 text-gray-300 mx-auto mb-6" />
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">No Competitions Available</h3>
+            <p className="text-gray-600">
               {searchTerm || filterStatus 
                 ? "No competitions match your search criteria. Try adjusting your filters."
                 : "We're preparing something extraordinary. Check back soon for exclusive modeling opportunities."}
@@ -302,7 +303,7 @@ export default function CompetitionSection({ initialCompetition }: Props) {
                   setFilterStatus(null);
                   if (searchRef.current) searchRef.current.value = "";
                 }}
-                className="mt-6 px-6 py-2 bg-[#344c3d] text-white rounded-full text-sm font-medium hover:bg-[#2a3e31] transition-colors"
+                className="mt-6 px-6 py-2 bg-[#344c3d] text-white rounded-md text-sm font-medium hover:bg-[#2a3e31] transition-colors"
               >
                 Clear Filters
               </button>
@@ -315,14 +316,14 @@ export default function CompetitionSection({ initialCompetition }: Props) {
     return competitions.map((competition, index) => (
       <motion.div
         key={competition._id}
-        initial={{ opacity: 0, y: 30 }}
+        initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        transition={{ duration: 0.6, delay: index * 0.1 }}
+        transition={{ duration: 0.4, delay: index * 0.05 }}
         className={`group relative ${viewMode === 'list' ? 'col-span-full' : ''}`}
         onClick={() => viewMode === 'list' && handleCardClick(competition._id)}
       >
-        <div className={`bg-white rounded-3xl overflow-hidden border border-[#344c3d]/10 transition-all duration-500 hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.2)] hover:translate-y-[-8px] h-full flex ${viewMode === 'list' ? 'flex-row' : 'flex-col'}`}>
+        <div className={`bg-white rounded-lg overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 h-full flex ${viewMode === 'list' ? 'flex-row' : 'flex-col'}`}>
           {/* Card Image */}
           <div className={`relative ${viewMode === 'list' ? 'w-1/3 min-w-[240px]' : 'aspect-[3/4]'} overflow-hidden`}>
             <img 
@@ -333,7 +334,7 @@ export default function CompetitionSection({ initialCompetition }: Props) {
                   : "/placeholder.svg?height=400&width=300"
               }
               alt={competition.title}
-              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
                 target.src = "/placeholder.svg?height=400&width=300";
@@ -342,7 +343,7 @@ export default function CompetitionSection({ initialCompetition }: Props) {
             
             {/* Status Badge */}
             <div className="absolute top-4 right-4 z-20">
-              <div className={`${getStatusStyles(competition.status).bg} px-3 py-1.5 rounded-full text-xs font-medium flex items-center shadow-lg`}>
+              <div className={`${getStatusStyles(competition.status).bg} px-3 py-1.5 rounded-md text-xs font-medium flex items-center shadow-sm`}>
                 {getStatusStyles(competition.status).icon}
                 <span>{competition.status.charAt(0).toUpperCase() + competition.status.slice(1)}</span>
               </div>
@@ -351,7 +352,7 @@ export default function CompetitionSection({ initialCompetition }: Props) {
             {/* Featured Tag - Example for special competitions */}
             {index === 0 && (
               <div className="absolute top-4 left-4 z-20">
-                <div className="bg-gradient-to-r from-purple-500 to-indigo-500 px-3 py-1.5 rounded-full text-xs font-medium flex items-center shadow-lg text-white">
+                <div className="bg-purple-600 px-3 py-1.5 rounded-md text-xs font-medium flex items-center shadow-sm text-white">
                   <Sparkles className="w-3 h-3 mr-1" />
                   <span>Featured</span>
                 </div>
@@ -362,12 +363,12 @@ export default function CompetitionSection({ initialCompetition }: Props) {
           {/* Card Content */}
           <div className={`p-6 flex flex-col flex-grow ${viewMode === 'list' ? 'w-2/3' : ''}`}>
             <div className="flex justify-between items-start mb-2">
-              <h3 className="text-xl font-bold text-[#344c3d] font-['Clash_Display'] line-clamp-2">
+              <h3 className="text-xl font-bold text-gray-900 line-clamp-2">
                 {competition.title}
               </h3>
               
               {viewMode === 'list' && (
-                <div className="flex items-center gap-2 text-xs text-[#344c3d]/60">
+                <div className="flex items-center gap-2 text-xs text-gray-500">
                   <Calendar className="w-3.5 h-3.5" />
                   <span>
                     {format(new Date(competition.startDate), 'MMM dd')} - {format(new Date(competition.endDate), 'MMM dd, yyyy')}
@@ -376,12 +377,12 @@ export default function CompetitionSection({ initialCompetition }: Props) {
               )}
             </div>
             
-            <p className={`text-[#344c3d]/70 text-sm mb-4 ${viewMode === 'list' ? 'line-clamp-3' : 'line-clamp-2'} flex-grow`}>
+            <p className={`text-gray-600 text-sm mb-4 ${viewMode === 'list' ? 'line-clamp-3' : 'line-clamp-2'} flex-grow`}>
               {competition.description}
             </p>
             
             {viewMode === 'grid' && (
-              <div className="flex items-center gap-2 mb-4 text-xs text-[#344c3d]/60">
+              <div className="flex items-center gap-2 mb-4 text-xs text-gray-500">
                 <Calendar className="w-3.5 h-3.5" />
                 <span>
                   {format(new Date(competition.startDate), 'MMM dd')} - {format(new Date(competition.endDate), 'MMM dd, yyyy')}
@@ -391,22 +392,22 @@ export default function CompetitionSection({ initialCompetition }: Props) {
             
             {/* Stats Row */}
             <div className={`grid ${viewMode === 'list' ? 'grid-cols-4 gap-4' : 'grid-cols-3 gap-2'} mb-5`}>
-              <div className="bg-[#344c3d]/5 rounded-lg p-2 text-center">
-                <p className="text-xs text-[#344c3d]/70 mb-1">Participants</p>
-                <p className="text-sm font-semibold text-[#344c3d]">{competition.participants?.length || 0}</p>
+              <div className="bg-gray-50 rounded-md p-2 text-center">
+                <p className="text-xs text-gray-500 mb-1">Participants</p>
+                <p className="text-sm font-semibold text-gray-900">{competition.participants?.length || 0}</p>
               </div>
-              <div className="bg-[#344c3d]/5 rounded-lg p-2 text-center">
-                <p className="text-xs text-[#344c3d]/70 mb-1">Entry Fee</p>
-                <p className="text-sm font-semibold text-[#344c3d]">${competition.applicationFee}</p>
+              <div className="bg-gray-50 rounded-md p-2 text-center">
+                <p className="text-xs text-gray-500 mb-1">Entry Fee</p>
+                <p className="text-sm font-semibold text-gray-900">${competition.applicationFee}</p>
               </div>
-              <div className="bg-[#344c3d]/5 rounded-lg p-2 text-center">
-                <p className="text-xs text-[#344c3d]/70 mb-1">Days Left</p>
-                <p className="text-sm font-semibold text-[#344c3d]">{competition.daysUntilEnd}</p>
+              <div className="bg-gray-50 rounded-md p-2 text-center">
+                <p className="text-xs text-gray-500 mb-1">Days Left</p>
+                <p className="text-sm font-semibold text-gray-900">{competition.daysUntilEnd}</p>
               </div>
               {viewMode === 'list' && (
-                <div className="bg-[#344c3d]/5 rounded-lg p-2 text-center">
-                  <p className="text-xs text-[#344c3d]/70 mb-1">Status</p>
-                  <p className="text-sm font-semibold text-[#344c3d] capitalize">{competition.status}</p>
+                <div className="bg-gray-50 rounded-md p-2 text-center">
+                  <p className="text-xs text-gray-500 mb-1">Status</p>
+                  <p className="text-sm font-semibold text-gray-900 capitalize">{competition.status}</p>
                 </div>
               )}
             </div>
@@ -418,7 +419,7 @@ export default function CompetitionSection({ initialCompetition }: Props) {
                 handleApply(competition._id);
               }}
               disabled={competition.status === 'completed'}
-              className={`w-full py-3 rounded-xl font-medium transition-all duration-300 flex items-center justify-center gap-2
+              className={`w-full py-3 rounded-md font-medium transition-all duration-300 flex items-center justify-center gap-2
                 ${competition.status === 'completed' 
                   ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                   : 'bg-[#344c3d] text-white hover:bg-[#2a3e31]'
@@ -436,21 +437,21 @@ export default function CompetitionSection({ initialCompetition }: Props) {
           </div>
         </div>
         
-        {/* Expanded Card Details (for list view) */}
+        {/* Expanded Card Details (for list view) - Simplified */}
         {viewMode === 'list' && selectedCard === competition._id && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="mt-4 bg-white rounded-2xl p-6 shadow-lg border border-[#344c3d]/10"
+            className="mt-4 bg-white rounded-lg p-6 shadow-md border border-gray-200"
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div>
-                <h4 className="text-lg font-bold text-[#344c3d] mb-3">Competition Details</h4>
-                <p className="text-[#344c3d]/70 mb-4">{competition.description}</p>
+                <h4 className="text-lg font-bold text-gray-900 mb-3">Competition Details</h4>
+                <p className="text-gray-600 mb-4">{competition.description}</p>
                 
-                <h4 className="text-lg font-bold text-[#344c3d] mb-3">Requirements</h4>
-                <ul className="list-disc pl-5 text-[#344c3d]/70 space-y-1 mb-4">
+                <h4 className="text-lg font-bold text-gray-900 mb-3">Requirements</h4>
+                <ul className="list-disc pl-5 text-gray-600 space-y-1 mb-4">
                   <li>Age: 18-30 years</li>
                   <li>Professional portfolio</li>
                   <li>Valid ID/Passport</li>
@@ -459,15 +460,15 @@ export default function CompetitionSection({ initialCompetition }: Props) {
               </div>
               
               <div>
-                <h4 className="text-lg font-bold text-[#344c3d] mb-3">Timeline</h4>
+                <h4 className="text-lg font-bold text-gray-900 mb-3">Timeline</h4>
                 <div className="space-y-4">
                   <div className="flex items-start gap-3">
                     <div className="w-6 h-6 rounded-full bg-[#344c3d] flex items-center justify-center mt-0.5">
                       <span className="text-white text-xs">1</span>
                     </div>
                     <div>
-                      <p className="font-medium text-[#344c3d]">Application Period</p>
-                      <p className="text-sm text-[#344c3d]/70">
+                      <p className="font-medium text-gray-900">Application Period</p>
+                      <p className="text-sm text-gray-600">
                         {format(new Date(competition.startDate), 'MMMM dd, yyyy')} - {format(new Date(competition.endDate), 'MMMM dd, yyyy')}
                       </p>
                     </div>
@@ -478,8 +479,8 @@ export default function CompetitionSection({ initialCompetition }: Props) {
                       <span className="text-white text-xs">2</span>
                     </div>
                     <div>
-                      <p className="font-medium text-[#344c3d]">Selection Process</p>
-                      <p className="text-sm text-[#344c3d]/70">
+                      <p className="font-medium text-gray-900">Selection Process</p>
+                      <p className="text-sm text-gray-600">
                         {format(new Date(competition.endDate), 'MMMM dd, yyyy')} - {format(new Date(new Date(competition.endDate).getTime() + 14 * 24 * 60 * 60 * 1000), 'MMMM dd, yyyy')}
                       </p>
                     </div>
@@ -490,8 +491,8 @@ export default function CompetitionSection({ initialCompetition }: Props) {
                       <span className="text-white text-xs">3</span>
                     </div>
                     <div>
-                      <p className="font-medium text-[#344c3d]">Final Event</p>
-                      <p className="text-sm text-[#344c3d]/70">
+                      <p className="font-medium text-gray-900">Final Event</p>
+                      <p className="text-sm text-gray-600">
                         {format(new Date(new Date(competition.endDate).getTime() + 30 * 24 * 60 * 60 * 1000), 'MMMM dd, yyyy')}
                       </p>
                     </div>
@@ -504,7 +505,7 @@ export default function CompetitionSection({ initialCompetition }: Props) {
                     handleApply(competition._id);
                   }}
                   disabled={competition.status === 'completed'}
-                  className={`mt-6 w-full py-3 rounded-xl font-medium transition-all duration-300 flex items-center justify-center gap-2
+                  className={`mt-6 w-full py-3 rounded-md font-medium transition-all duration-300 flex items-center justify-center gap-2
                     ${competition.status === 'completed' 
                       ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                       : 'bg-[#344c3d] text-white hover:bg-[#2a3e31]'
@@ -556,15 +557,11 @@ export default function CompetitionSection({ initialCompetition }: Props) {
             <span className="text-[#344c3d] font-medium text-sm">Exclusive Opportunities</span>
           </motion.div>
           
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            viewport={{ once: true }}
-            className="text-5xl sm:text-6xl md:text-7xl font-bold text-[#344c3d] mb-6 font-['Clash_Display'] tracking-tight"
+          <div     
+            className="text-2xl sm:text-3xl md:text-4xl font-bold"
           >
-            Fashion Competitions
-          </motion.h2>
+            Join Our Exclusive Competition
+          </div>
           
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -579,7 +576,7 @@ export default function CompetitionSection({ initialCompetition }: Props) {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
             viewport={{ once: true }}
-            className="text-[#344c3d]/80 mx-auto text-lg leading-relaxed"
+            className="text-neutral-500 mx-auto text-lg leading-relaxed"
           >
             Showcase your talent on the global stage. Our prestigious competitions connect you with 
             industry leaders, offering unparalleled exposure and career-defining opportunities.
@@ -596,7 +593,7 @@ export default function CompetitionSection({ initialCompetition }: Props) {
         >
           <div className="flex flex-col md:flex-row gap-4">
             <form onSubmit={handleSearch} className="flex-grow relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#344c3d]/40 h-5 w-5" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
               <input
                 ref={searchRef}
                 type="text"
@@ -608,7 +605,7 @@ export default function CompetitionSection({ initialCompetition }: Props) {
                 <button
                   type="button"
                   onClick={clearSearch}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#344c3d]/40 hover:text-[#344c3d] transition-colors"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -619,7 +616,7 @@ export default function CompetitionSection({ initialCompetition }: Props) {
               <div className="relative">
                 <button
                   onClick={() => setIsFilterOpen(!isFilterOpen)}
-                  className="flex items-center gap-2 px-4 py-3 rounded-xl border border-[#344c3d]/10 bg-white hover:bg-[#344c3d]/5 transition-colors"
+                  className="flex items-center gap-2 px-4 py-3 rounded-xl border border-[#344c3d]/10 bg-white hover:bg-gray-50 transition-colors"
                 >
                   <Filter className="h-5 w-5 text-[#344c3d]" />
                   <span className="text-[#344c3d]">
@@ -629,7 +626,7 @@ export default function CompetitionSection({ initialCompetition }: Props) {
                 </button>
                 
                 {isFilterOpen && (
-                  <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-[#344c3d]/10 overflow-hidden z-50">
+                  <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-[#344c3d]/10 overflow-hidden z-50">
                     <div className="p-2">
                       <button
                         onClick={() => handleFilterChange(null)}
@@ -738,144 +735,7 @@ export default function CompetitionSection({ initialCompetition }: Props) {
           </motion.div>
         )}
         
-        {/* Featured Competitions Section */}
-        {competitions.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="mt-32 px-4 sm:px-6 lg:px-8"
-          >
-            <div className="text-center mb-16">
-              <h3 className="text-3xl sm:text-4xl font-bold text-[#344c3d] mb-4 font-['Clash_Display']">
-                Highlighted Opportunities
-              </h3>
-              <p className="text-[#344c3d]/70 max-w-2xl mx-auto">
-                These premium competitions offer exceptional exposure and career advancement opportunities for models.
-              </p>
-            </div>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Featured Competition 1 */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6 }}
-                className="bg-gradient-to-br from-[#344c3d] to-[#1a2a20] text-white rounded-3xl overflow-hidden shadow-xl relative group"
-              >
-                <div className="absolute inset-0 bg-black/20 z-10"></div>
-                <img 
-                  src="/images/featured-competition-1.jpg" 
-                  alt="International Model Search"
-                  className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-50 transition-opacity duration-500"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = "https://images.unsplash.com/photo-1469334031218-e382a71b716b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80";
-                  }}
-                />
-                <div className="relative z-20 p-8 h-full flex flex-col">
-                  <div className="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium w-fit mb-auto">
-                    Premium
-                  </div>
-                  <div className="mt-auto">
-                    <h4 className="text-2xl font-bold mb-2">International Model Search</h4>
-                    <p className="text-white/80 mb-6 line-clamp-2">Global competition with opportunities to work with top fashion brands and photographers.</p>
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center gap-2">
-                        <Users className="h-4 w-4 text-white/70" />
-                        <span className="text-sm text-white/70">1,234 Participants</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <DollarSign className="h-4 w-4 text-white/70" />
-                        <span className="text-sm text-white/70">$250 Entry</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-              
-              {/* Featured Competition 2 */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="bg-gradient-to-br from-[#6cbc8b] to-[#4a8a63] text-white rounded-3xl overflow-hidden shadow-xl relative group"
-              >
-                <div className="absolute inset-0 bg-black/20 z-10"></div>
-                <img 
-                  src="/images/featured-competition-2.jpg" 
-                  alt="Fashion Week Casting"
-                  className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-50 transition-opacity duration-500"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = "https://images.unsplash.com/photo-1509631179647-0177331693ae?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1476&q=80";
-                  }}
-                />
-                <div className="relative z-20 p-8 h-full flex flex-col">
-                  <div className="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium w-fit mb-auto">
-                    Exclusive
-                  </div>
-                  <div className="mt-auto">
-                    <h4 className="text-2xl font-bold mb-2">Fashion Week Casting</h4>
-                    <p className="text-white/80 mb-6 line-clamp-2">Walk the runway at the prestigious African Fashion Week with top designers.</p>
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center gap-2">
-                        <Users className="h-4 w-4 text-white/70" />
-                        <span className="text-sm text-white/70">876 Participants</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <DollarSign className="h-4 w-4 text-white/70" />
-                        <span className="text-sm text-white/70">$150 Entry</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-              
-              {/* Featured Competition 3 */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.4 }}
-                className="bg-gradient-to-br from-[#d4a373] to-[#a07942] text-white rounded-3xl overflow-hidden shadow-xl relative group"
-              >
-                <div className="absolute inset-0 bg-black/20 z-10"></div>
-                <img 
-                  src="/images/featured-competition-3.jpg" 
-                  alt="Emerging Talent Awards"
-                  className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-50 transition-opacity duration-500"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = "https://images.unsplash.com/photo-1581338834647-b0fb40704e21?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80";
-                  }}
-                />
-                <div className="relative z-20 p-8 h-full flex flex-col">
-                  <div className="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium w-fit mb-auto">
-                    New Talent
-                  </div>
-                  <div className="mt-auto">
-                    <h4 className="text-2xl font-bold mb-2">Emerging Talent Awards</h4>
-                    <p className="text-white/80 mb-6 line-clamp-2">Dedicated to discovering and promoting fresh faces in the modeling industry.</p>
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center gap-2">
-                        <Users className="h-4 w-4 text-white/70" />
-                        <span className="text-sm text-white/70">543 Participants</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <DollarSign className="h-4 w-4 text-white/70" />
-                        <span className="text-sm text-white/70">$50 Entry</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            </div>
-          </motion.div>
-        )}
+   
         
    
       </div>

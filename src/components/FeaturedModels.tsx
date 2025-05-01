@@ -39,15 +39,6 @@ export default function FeaturedModels() {
   const [autoplay, setAutoplay] = useState(true)
   const autoplayRef = useRef<NodeJS.Timeout | null>(null)
   
-  // Colors based on the design spec
-  const colors = {
-    color1: "#FFFFFF", // Text for names
-    color2: "#D4AF37", // Text for titles and indicator dots
-    color3: "#B8860B", // Borders and navigation arrows
-    color4: "#1E3A29", // Social proof badges and gradient end
-    color5: "#0A1F14", // Gradient start
-  }
-  
   const fetchContestants = useCallback(async () => {
     try {
       setLoading(true)
@@ -94,19 +85,16 @@ export default function FeaturedModels() {
     }
   }, [page])
   
-  // Load more when scrolling to the bottom
   useEffect(() => {
     if (inView && hasMore && !loading) {
       setPage(prev => prev + 1)
     }
   }, [inView, hasMore, loading])
   
-  // Initial load
   useEffect(() => {
     fetchContestants()
   }, [fetchContestants])
   
-  // Autoplay carousel
   useEffect(() => {
     if (autoplay && contestants.length > 0) {
       autoplayRef.current = setInterval(() => {
@@ -121,7 +109,6 @@ export default function FeaturedModels() {
     }
   }, [autoplay, contestants.length])
   
-  // Handle vote click
   const handleVote = async (id: string) => {
     const token = localStorage.getItem('modelToken')
     if (!token) {
@@ -164,12 +151,10 @@ export default function FeaturedModels() {
     }
   }
   
-  // Handle profile click
   const handleProfileClick = (id: string) => {
     navigate(`/models/${id}`)
   }
   
-  // Navigation functions
   const nextSlide = () => {
     if (autoplayRef.current) clearInterval(autoplayRef.current)
     setAutoplay(false)
@@ -187,15 +172,15 @@ export default function FeaturedModels() {
     return Array.from({ length: 3 }).map((_, index) => (
       <div 
         key={`skeleton-${index}`} 
-        className="bg-white/5 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10 shadow-lg animate-pulse"
+        className="bg-white rounded-lg overflow-hidden border border-[#344c3d]/10 shadow-md animate-pulse"
       >
-        <div className="aspect-[2/3] bg-gradient-to-b from-[#1E3A29]/10 to-[#0A1F14]/5"></div>
+        <div className="aspect-[2/3] bg-gradient-to-b from-[#344c3d]/5 to-[#344c3d]/10"></div>
         <div className="p-6 space-y-4">
-          <div className="h-6 bg-white/10 rounded-lg w-2/3"></div>
-          <div className="h-4 bg-white/10 rounded-lg w-1/2"></div>
+          <div className="h-6 bg-[#344c3d]/10 rounded-lg w-2/3"></div>
+          <div className="h-4 bg-[#344c3d]/10 rounded-lg w-1/2"></div>
           <div className="flex justify-between items-center pt-4">
-            <div className="h-8 bg-white/10 rounded-full w-24"></div>
-            <div className="h-8 bg-white/10 rounded-full w-24"></div>
+            <div className="h-8 bg-[#344c3d]/10 rounded-full w-24"></div>
+            <div className="h-8 bg-[#344c3d]/10 rounded-full w-24"></div>
           </div>
         </div>
       </div>
@@ -203,45 +188,64 @@ export default function FeaturedModels() {
   };
 
   return (
-    <section className="relative py-24 sm:py-32 overflow-hidden bg-[#F8F9FA]">
-      {/* Subtle background pattern */}
-      <div className="absolute inset-0 bg-gradient-to-b from-white to-[#F0F2F5] opacity-80"></div>
-      <div className="absolute inset-0 bg-[url('/images/subtle-pattern.png')] bg-repeat opacity-5"></div>
+    <section className="relative py-24 overflow-hidden bg-white">
+      {/* Unique background pattern - diagonal grid */}
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute inset-0" style={{ 
+          backgroundImage: 'linear-gradient(to right, #344c3d 1px, transparent 1px), linear-gradient(to bottom, #344c3d 1px, transparent 1px)',
+          backgroundSize: '40px 40px'
+        }}></div>
+      </div>
       
-      {/* Decorative elements */}
-      <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-gradient-to-b from-[#D4AF37]/5 to-transparent rounded-bl-full"></div>
-      <div className="absolute bottom-0 left-0 w-1/4 h-1/4 bg-gradient-to-t from-[#1E3A29]/5 to-transparent rounded-tr-full"></div>
+      {/* Unique decorative elements - hexagonal shapes */}
+      <div className="absolute top-20 left-20 w-64 h-64 opacity-10">
+        <svg viewBox="0 0 100 100" className="w-full h-full text-[#344c3d]">
+          <polygon points="50 0, 93.3 25, 93.3 75, 50 100, 6.7 75, 6.7 25" fill="currentColor"/>
+        </svg>
+      </div>
+      <div className="absolute bottom-20 right-20 w-96 h-96 opacity-10">
+        <svg viewBox="0 0 100 100" className="w-full h-full text-[#344c3d]">
+          <polygon points="50 0, 93.3 25, 93.3 75, 50 100, 6.7 75, 6.7 25" fill="currentColor"/>
+        </svg>
+      </div>
       
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        {/* Section Header */}
+      <div className="container mx-auto px-4 relative z-10">
+        {/* Unique section header with staggered text */}
         <div className="text-center mb-16 max-w-3xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
-            className="inline-flex items-center mb-4 px-4 py-1.5 bg-[#1E3A29]/5 rounded-full"
+            className="inline-flex items-center mb-4 px-4 py-1.5 bg-[#344c3d]/10 rounded-md"
           >
-            <Award className="w-4 h-4 text-[#D4AF37] mr-2" />
-            <span className="text-[#1E3A29] font-medium text-sm">Elite Talent Showcase</span>
+            <Award className="w-4 h-4 text-[#344c3d] mr-2" />
+            <span className="text-[#344c3d] font-medium text-sm">TALENT SHOWCASE</span>
           </motion.div>
           
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            viewport={{ once: true }}
-            className="text-4xl sm:text-5xl md:text-6xl font-bold text-[#1E3A29] mb-6 font-['Clash_Display'] tracking-tight"
-          >
-            Featured Models
-          </motion.h2>
+          <div className="relative h-24 mb-6 overflow-hidden">
+            {["Exceptional", "Featured", "Talented"].map((word, i) => (
+              <motion.h2
+                key={word}
+                className="text-4xl md:text-5xl font-bold text-[#344c3d] absolute w-full left-0 right-0"
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ 
+                  opacity: activeIndex % 3 === i ? 1 : 0,
+                  y: activeIndex % 3 === i ? 0 : 40
+                }}
+                transition={{ duration: 0.6 }}
+              >
+                {word} <span className="text-[#344c3d]/70">Models</span>
+              </motion.h2>
+            ))}
+          </div>
           
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
+            initial={{ scaleX: 0 }}
+            whileInView={{ scaleX: 1 }}
             viewport={{ once: true }}
-            className="h-[2px] w-24 bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent mx-auto mb-8"
+            transition={{ duration: 0.8 }}
+            className="h-[2px] w-24 bg-[#344c3d] mx-auto mb-8 origin-center"
           />
           
           <motion.p
@@ -249,24 +253,16 @@ export default function FeaturedModels() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
             viewport={{ once: true }}
-            className="text-[#1E3A29]/80 mx-auto text-lg leading-relaxed"
+            className="text-gray-600 mx-auto text-lg leading-relaxed"
           >
             Discover our exceptional talent portfolio showcasing the most promising models in the industry.
             These rising stars represent the pinnacle of elegance, poise, and professional excellence.
           </motion.p>
         </div>
 
-        {/* Carousel Navigation */}
-        <div className="flex justify-between items-center mb-8">
-          <button 
-            onClick={prevSlide}
-            className="w-12 h-12 rounded-full flex items-center justify-center bg-white shadow-lg text-[#B8860B] hover:bg-[#B8860B] hover:text-white transition-all duration-300"
-            aria-label="Previous models"
-          >
-            <ChevronLeft className="w-6 h-6" />
-          </button>
-          
-          <div className="flex items-center gap-2">
+        {/* Unique carousel navigation - vertical dots with numbers */}
+        <div className="flex justify-between items-center mb-12">
+          <div className="hidden md:flex flex-col items-center gap-4 absolute left-4 top-1/2 transform -translate-y-1/2 z-20">
             {Array.from({ length: Math.ceil(contestants.length / 3) }).map((_, index) => (
               <button
                 key={`dot-${index}`}
@@ -275,130 +271,146 @@ export default function FeaturedModels() {
                   setAutoplay(false)
                   if (autoplayRef.current) clearInterval(autoplayRef.current)
                 }}
+                className={`w-10 h-10 rounded-md flex items-center justify-center transition-all duration-300 ${
+                  activeIndex === index 
+                    ? 'bg-[#344c3d] text-white' 
+                    : 'bg-[#344c3d]/10 text-[#344c3d] hover:bg-[#344c3d]/20'
+                }`}
+                aria-label={`Go to slide ${index + 1}`}
+              >
+                {index + 1}
+              </button>
+            ))}
+          </div>
+          
+          {/* Mobile navigation dots */}
+          <div className="flex md:hidden items-center gap-2 mx-auto">
+            {Array.from({ length: Math.ceil(contestants.length / 3) }).map((_, index) => (
+              <button
+                key={`dot-mobile-${index}`}
+                onClick={() => {
+                  setActiveIndex(index)
+                  setAutoplay(false)
+                  if (autoplayRef.current) clearInterval(autoplayRef.current)
+                }}
                 className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
                   activeIndex === index 
-                    ? 'bg-[#D4AF37] w-8' 
-                    : 'bg-[#D4AF37]/30'
+                    ? 'bg-[#344c3d] w-8' 
+                    : 'bg-[#344c3d]/30'
                 }`}
                 aria-label={`Go to slide ${index + 1}`}
               />
             ))}
           </div>
-          
-          <button 
-            onClick={nextSlide}
-            className="w-12 h-12 rounded-full flex items-center justify-center bg-white shadow-lg text-[#B8860B] hover:bg-[#B8860B] hover:text-white transition-all duration-300"
-            aria-label="Next models"
-          >
-            <ChevronRight className="w-6 h-6" />
-          </button>
         </div>
 
-        {/* Models Carousel */}
+        {/* Unique models display - hexagonal grid layout */}
         <div className="relative overflow-hidden">
           <AnimatePresence mode="wait">
             <motion.div
               key={`carousel-${activeIndex}`}
-              initial={{ opacity: 0, x: 100 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -100 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               transition={{ duration: 0.5 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10"
+              className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6"
             >
               {loading && contestants.length === 0
                 ? renderSkeletons()
                 : contestants
                     .slice(activeIndex * 3, activeIndex * 3 + 3)
-                    .map((contestant) => (
+                    .map((contestant, idx) => (
                       <motion.div
                         key={contestant.uniqueKey}
                         initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6 }}
-                        className="relative group"
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: idx * 0.1 }}
+                        className="group"
+                        style={{ 
+                          transform: `translateY(${idx % 2 === 1 ? '40px' : '0px'})` 
+                        }}
                       >
-                        <div className="relative bg-white rounded-2xl overflow-hidden shadow-xl h-full transform transition-transform duration-500 group-hover:scale-[1.02]">
-                          {/* Premium badge for top models */}
-                          {contestants.indexOf(contestant) < 2 && (
-                            <div className="absolute top-4 right-4 z-30">
-                              <div className="bg-[#1E3A29] px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1.5 text-white shadow-lg">
-                                <TrendingUp className="w-3 h-3" />
-                                <span>Top Model</span>
-                              </div>
-                            </div>
-                          )}
-                          
-                          {/* Model Image with radial gradient overlay */}
-                          <div className="aspect-[2/3] relative overflow-hidden">
-                            <div className="absolute inset-0 bg-gradient-to-t from-[#0A1F14] via-[#1E3A29]/50 to-transparent z-10"></div>
-                            <img
-                              src={contestant.portraitPhoto ? `http://localhost:3000/${contestant.portraitPhoto.replace(/\\/g, "/")}` : "/placeholder-model.jpg"}
-                              alt={contestant.fullName}
-                              className="w-full h-full object-cover transition-transform duration-5000 ease-in-out group-hover:scale-105"
-                              onError={(e) => {
-                                const target = e.target as HTMLImageElement;
-                                target.src = `https://randomuser.me/api/portraits/${Math.random() > 0.5 ? 'women' : 'men'}/${Math.floor(Math.random() * 70) + 10}.jpg`;
-                              }}
-                            />
+                        <div className="relative bg-white rounded-lg overflow-hidden shadow-md border border-[#344c3d]/10 transition-all duration-500 group-hover:shadow-xl">
+                          {/* Unique model image presentation with clip path */}
+                          <div className="aspect-[3/4] relative overflow-hidden">
+                            <div className="absolute inset-0 bg-gradient-to-t from-[#344c3d] via-transparent to-transparent z-10 opacity-60"></div>
                             
-                            {/* Circular avatar with color-3 border */}
-                            <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 z-20">
-                              <div className="w-20 h-20 rounded-full border-4 border-[#B8860B] overflow-hidden bg-white">
-                                <img
-                                  src={contestant.portraitPhoto ? `http://localhost:3000/${contestant.portraitPhoto.replace(/\\/g, "/")}` : "/placeholder-model.jpg"}
-                                  alt={contestant.fullName}
-                                  className="w-full h-full object-cover"
-                                  onError={(e) => {
-                                    const target = e.target as HTMLImageElement;
-                                    target.src = `https://randomuser.me/api/portraits/${Math.random() > 0.5 ? 'women' : 'men'}/${Math.floor(Math.random() * 70) + 10}.jpg`;
-                                  }}
-                                />
+                            {/* Unique image mask with clip-path */}
+                            <div className="absolute inset-0 z-0" style={{ 
+                              clipPath: 'polygon(0% 0%, 100% 0%, 100% 85%, 50% 100%, 0% 85%)'
+                            }}>
+                              <img
+                                src={contestant.portraitPhoto ? `http://localhost:3000/${contestant.portraitPhoto.replace(/\\/g, "/")}` : "/placeholder-model.jpg"}
+                                alt={contestant.fullName}
+                                className="w-full h-full object-cover transition-transform duration-700 ease-in-out group-hover:scale-110"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.src = `https://randomuser.me/api/portraits/${Math.random() > 0.5 ? 'women' : 'men'}/${Math.floor(Math.random() * 70) + 10}.jpg`;
+                                }}
+                              />
+                            </div>
+                            
+                            {/* Top model badge */}
+                            {idx === 0 && (
+                              <div className="absolute top-4 right-4 z-30">
+                                <div className="bg-[#344c3d] px-3 py-1 rounded-md text-xs font-medium flex items-center gap-1.5 text-white shadow-lg">
+                                  <TrendingUp className="w-3 h-3" />
+                                  <span>Featured</span>
+                                </div>
+                              </div>
+                            )}
+                            
+                            {/* Unique vote count display */}
+                            <div className="absolute bottom-4 left-4 z-20">
+                              <div className="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-md text-xs font-medium flex items-center gap-1.5 text-[#344c3d] shadow-sm">
+                                <Star className="w-3 h-3 fill-[#344c3d]" />
+                                <span>{contestant.votes?.count || 0} Votes</span>
                               </div>
                             </div>
                           </div>
                           
-                          {/* Model Info */}
-                          <div className="p-6 pt-12 text-center">
-                            <h3 className="text-xl font-bold text-[#1E3A29] mb-1 font-['Clash_Display']">{contestant.fullName}</h3>
-                            <p className="text-[#D4AF37] text-sm mb-4 font-medium">{contestant.competition?.title || "Elite Model"}</p>
-                            
-                            {/* Social proof badge in color-4 */}
-                            <div className="flex justify-center mb-6">
-                              <div className="bg-[#1E3A29]/10 rounded-full px-4 py-1.5 inline-flex items-center gap-2">
-                                <Star className="w-4 h-4 text-[#D4AF37]" />
-                                <span className="text-[#1E3A29] font-medium">{contestant.votes?.count || 0} Votes</span>
-                              </div>
+                          {/* Model Info with unique layout */}
+                          <div className="p-6 relative">
+                            {/* Unique name display with background element */}
+                            <div className="relative mb-4">
+                              <div className="absolute -left-2 -top-2 w-12 h-12 bg-[#344c3d]/10 rounded-md -z-10"></div>
+                              <h3 className="text-xl font-bold text-[#344c3d] leading-tight">
+                                {contestant.fullName}
+                              </h3>
+                              <p className="text-[#344c3d]/70 text-sm font-medium">
+                                {contestant.competition?.title || "Elite Model"}
+                              </p>
                             </div>
                             
-                            <div className="flex justify-center items-center gap-4">
-                              {/* Vote Button */}
+                            {/* Action buttons with unique hover effects */}
+                            <div className="flex items-center gap-3 mb-4">
                               <button
                                 onClick={() => handleVote(contestant._id)}
-                                className="flex items-center gap-2 px-4 py-2 bg-[#1E3A29] hover:bg-[#0A1F14] text-white rounded-full transition-all duration-300"
+                                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-[#344c3d] text-white rounded-md transition-all duration-300 overflow-hidden relative group/btn"
                               >
-                                <Star className="w-4 h-4" />
-                                <span>Vote</span>
+                                <div className="absolute inset-0 bg-white translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300"></div>
+                                <Star className="w-4 h-4 relative z-10 transition-colors duration-300 group-hover/btn:text-[#344c3d]" />
+                                <span className="relative z-10 transition-colors duration-300 group-hover/btn:text-[#344c3d]">Vote</span>
                               </button>
                               
-                              {/* View Profile Button */}
                               <button
                                 onClick={() => handleProfileClick(contestant._id)}
-                                className="flex items-center gap-2 px-4 py-2 bg-white border border-[#1E3A29] text-[#1E3A29] hover:bg-[#1E3A29] hover:text-white rounded-full transition-all duration-300"
+                                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-[#344c3d] text-[#344c3d] rounded-md transition-all duration-300 overflow-hidden relative group/btn"
                               >
-                                <Eye className="w-4 h-4" />
-                                <span>Profile</span>
+                                <div className="absolute inset-0 bg-[#344c3d] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300"></div>
+                                <Eye className="w-4 h-4 relative z-10 transition-colors duration-300 group-hover/btn:text-white" />
+                                <span className="relative z-10 transition-colors duration-300 group-hover/btn:text-white">Profile</span>
                               </button>
                             </div>
                             
-                            {/* Social Links */}
-                            <div className="flex justify-center items-center gap-3 mt-4">
+                            {/* Social links with unique animated hover */}
+                            <div className="flex items-center justify-center gap-4">
                               {contestant.socialLinks?.instagram && (
                                 <a
                                   href={contestant.socialLinks.instagram}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="w-8 h-8 rounded-full bg-[#1E3A29]/10 hover:bg-[#1E3A29] flex items-center justify-center text-[#1E3A29] hover:text-white transition-all duration-300"
+                                  className="w-9 h-9 rounded-md bg-[#344c3d]/10 flex items-center justify-center text-[#344c3d] transition-all duration-300 hover:bg-[#344c3d] hover:text-white hover:scale-110"
                                 >
                                   <Instagram className="w-4 h-4" />
                                 </a>
@@ -408,7 +420,7 @@ export default function FeaturedModels() {
                                   href={contestant.socialLinks.twitter}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="w-8 h-8 rounded-full bg-[#1E3A29]/10 hover:bg-[#1E3A29] flex items-center justify-center text-[#1E3A29] hover:text-white transition-all duration-300"
+                                  className="w-9 h-9 rounded-md bg-[#344c3d]/10 flex items-center justify-center text-[#344c3d] transition-all duration-300 hover:bg-[#344c3d] hover:text-white hover:scale-110"
                                 >
                                   <Twitter className="w-4 h-4" />
                                 </a>
@@ -420,9 +432,26 @@ export default function FeaturedModels() {
                     ))}
             </motion.div>
           </AnimatePresence>
+          
+          {/* Unique navigation arrows */}
+          <button 
+            onClick={prevSlide}
+            className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-1/2 md:translate-x-0 w-12 h-12 rounded-md flex items-center justify-center bg-white shadow-lg text-[#344c3d] hover:bg-[#344c3d] hover:text-white transition-all duration-300 z-20 opacity-80 hover:opacity-100"
+            aria-label="Previous models"
+          >
+            <ChevronLeft className="w-6 h-6" />
+          </button>
+          
+          <button 
+            onClick={nextSlide}
+            className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-1/2 md:translate-x-0 w-12 h-12 rounded-md flex items-center justify-center bg-white shadow-lg text-[#344c3d] hover:bg-[#344c3d] hover:text-white transition-all duration-300 z-20 opacity-80 hover:opacity-100"
+            aria-label="Next models"
+          >
+            <ChevronRight className="w-6 h-6" />
+          </button>
         </div>
 
-        {/* View All Button */}
+        {/* Unique CTA button with animated arrow */}
         <div className="mt-16 text-center">
           <motion.button
             initial={{ opacity: 0, y: 20 }}
@@ -430,17 +459,24 @@ export default function FeaturedModels() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
             onClick={() => navigate('/leaderboard')}
-            className="inline-flex items-center gap-2 px-8 py-4 bg-[#1E3A29] text-white rounded-full hover:bg-[#0A1F14] transition-all duration-300 font-medium shadow-lg"
+            className="group inline-flex items-center gap-2 px-8 py-3 bg-[#344c3d] text-white rounded-md hover:bg-[#2a3e31] transition-all duration-300 font-medium shadow-md relative overflow-hidden"
           >
-            <span>Explore More...</span>
-            <ChevronRight className="w-4 h-4" />
+            <span className="relative z-10">View All Models</span>
+            <motion.div
+              className="relative z-10"
+              animate={{ x: [0, 5, 0] }}
+              transition={{ repeat: Infinity, duration: 1.5 }}
+            >
+              <ArrowRight className="w-5 h-5" />
+            </motion.div>
+            <div className="absolute inset-0 bg-[#2a3e31] scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
           </motion.button>
         </div>
 
         {/* Loading indicator */}
         {loading && contestants.length > 0 && (
           <div className="mt-10 flex justify-center">
-            <div className="w-12 h-12 rounded-full border-2 border-[#1E3A29]/20 border-t-[#D4AF37] animate-spin"></div>
+            <div className="w-12 h-12 rounded-md border-2 border-[#344c3d]/20 border-t-[#344c3d] animate-spin"></div>
           </div>
         )}
 

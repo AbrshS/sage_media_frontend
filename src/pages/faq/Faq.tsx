@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Plus, Minus, Search, HelpCircle, Award } from 'lucide-react';
+import { Plus, Minus, Search, HelpCircle } from 'lucide-react';
 import { useState } from 'react';
 import { Input } from "@/components/ui/input";
 import { Shield, Image, Laptop, Trophy } from 'lucide-react';
@@ -93,61 +93,64 @@ export default function FAQ() {
   })).filter(category => category.questions.length > 0);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#AEE0AE]/30 to-white py-24">
-      <div className="max-w-5xl mx-auto px-6">
-        {/* Luxury Header */}
-        <div className="text-center mb-20 relative">
-          {/* Decorative elements */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-1 bg-[#6B8E6E]"></div>
+    <div className="min-h-screen bg-white py-24">
+      <div className="max-w-6xl mx-auto px-6">
+        {/* Header - Simplified */}
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-[#344c3d]/10 text-[#344c3d] mb-4">
+            <span className="text-sm font-medium">HELP CENTER</span>
+          </div>
           
-          <h1 className="text-5xl md:text-6xl font-bold text-[#344C3D] mt-8 mb-6 font-['Playfair_Display']">
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
             Frequently Asked Questions
           </h1>
           
-          <p className="text-[#49695C] text-lg max-w-2xl mx-auto mb-12">
+          <div className="h-1 w-16 bg-[#344c3d] mx-auto mb-6"></div>
+          
+          <p className="text-gray-700 max-w-2xl mx-auto mb-8">
             Find answers to common questions about our platform, competitions, and services.
           </p>
           
-          {/* Luxury Search */}
-          <div className="relative max-w-2xl mx-auto">
+          {/* Search - Simplified */}
+          <div className="relative max-w-xl mx-auto">
             <Input
               type="text"
               placeholder="Search questions..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-16 pl-14 pr-6 rounded-full text-lg border-2 border-[#89B890]/30 focus:border-[#89B890] focus:ring-0 transition-colors bg-white/80 backdrop-blur-sm shadow-sm placeholder-[#89B890]"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-[#344c3d] focus:border-[#344c3d]"
             />
-            <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-[#89B890]" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           </div>
         </div>
 
-        {/* Category Navigation - Horizontal Tabs */}
-        <div className="mb-12 overflow-x-auto hide-scrollbar">
+        {/* Category Navigation - Horizontal Tabs - Simplified */}
+        <div className="mb-8 overflow-x-auto hide-scrollbar">
           <div className="flex space-x-2 min-w-max">
             {faqCategories.map((category, index) => (
               <button
                 key={index}
                 onClick={() => setActiveCategory(index)}
-                className={`px-6 py-4 rounded-full flex items-center gap-2 transition-all duration-300 whitespace-nowrap ${
+                className={`px-5 py-2 rounded-md flex items-center gap-2 transition-all duration-300 ${
                   activeCategory === index 
-                    ? 'bg-[#344C3D] text-white shadow-md' 
-                    : 'bg-white/80 text-[#344C3D] hover:bg-[#89B890]/10 border border-[#89B890]/30'
+                    ? 'bg-[#344c3d] text-white' 
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
-                <category.icon className={`w-5 h-5 ${activeCategory === index ? 'text-[#89B890]' : 'text-[#6B8E6E]'}`} />
+                <category.icon className="w-4 h-4" />
                 <span className="font-medium">{category.title}</span>
               </button>
             ))}
           </div>
         </div>
 
-        {/* FAQs - Luxury Accordion */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 border border-[#89B890]/10">
-          <div className="flex items-center gap-3 mb-8 border-b border-[#89B890]/20 pb-6">
-            <div className="w-12 h-12 rounded-full bg-[#344C3D] flex items-center justify-center">
-              <Trophy className="w-6 h-6 text-[#6B8E6E]" />
+        {/* FAQs - Simplified Accordion */}
+        <div className="mb-16">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 rounded-full bg-[#344c3d]/10 flex items-center justify-center">
+             
             </div>
-            <h2 className="text-2xl font-bold text-[#344C3D] font-['Playfair_Display']">
+            <h2 className="text-2xl font-bold text-gray-900">
               {faqCategories[activeCategory].title}
             </h2>
           </div>
@@ -159,20 +162,20 @@ export default function FAQ() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.3 }}
-                className="border border-[#89B890]/20 rounded-xl overflow-hidden"
+                className="border border-gray-200 rounded-lg overflow-hidden"
               >
                 <button
                   onClick={() => setActiveIndex(activeIndex === index ? null : index)}
-                  className="w-full flex items-center justify-between p-6 text-left hover:bg-[#89B890]/5 transition-all duration-300"
+                  className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50 transition-all duration-300"
                 >
-                  <span className="text-xl font-medium text-[#344C3D] pr-8">{faq.q}</span>
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-300 ${
-                    activeIndex === index ? 'bg-[#344C3D]' : 'bg-[#89B890]/20'
+                  <span className="text-lg font-medium text-gray-900 pr-8">{faq.q}</span>
+                  <div className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors duration-300 ${
+                    activeIndex === index ? 'bg-[#344c3d]' : 'bg-gray-200'
                   }`}>
                     {activeIndex === index ? (
-                      <Minus className="w-4 h-4 text-[#89B890]" />
+                      <Minus className="w-3 h-3 text-white" />
                     ) : (
-                      <Plus className="w-4 h-4 text-[#89B890]" />
+                      <Plus className="w-3 h-3 text-gray-600" />
                     )}
                   </div>
                 </button>
@@ -186,8 +189,8 @@ export default function FAQ() {
                   transition={{ duration: 0.3 }}
                   className="overflow-hidden"
                 >
-                  <div className="p-6 bg-[#AEE0AE]/20">
-                    <p className="text-lg text-[#49695C] leading-relaxed">
+                  <div className="p-4 bg-gray-50 border-t border-gray-200">
+                    <p className="text-gray-700 leading-relaxed">
                       {faq.a}
                     </p>
                   </div>
@@ -197,30 +200,19 @@ export default function FAQ() {
           </div>
         </div>
 
-        {/* Contact Support - Luxury Style */}
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="mt-16 text-center bg-[#344C3D] text-white p-10 rounded-2xl shadow-lg relative overflow-hidden"
-        >
-          {/* Decorative elements */}
-          <div className="absolute top-0 left-0 w-full h-full opacity-10">
-            <div className="absolute top-4 right-4 w-40 h-40 rounded-full border border-[#89B890]/50"></div>
-            <div className="absolute bottom-4 left-4 w-24 h-24 rounded-full border border-[#89B890]/50"></div>
-          </div>
-          
-          <h3 className="text-2xl font-bold mb-4 font-['Playfair_Display']">Still Have Questions?</h3>
-          <p className="text-white/80 text-lg mb-6 max-w-xl mx-auto">
+        {/* Contact Support - Simplified */}
+        <div className="bg-[#344c3d]/5 border border-[#344c3d]/10 rounded-lg p-8 text-center">
+          <h3 className="text-2xl font-bold text-gray-900 mb-4">Still Have Questions?</h3>
+          <p className="text-gray-700 mb-6 max-w-xl mx-auto">
             Our dedicated support team is ready to assist you with any inquiries not covered in our FAQ.
           </p>
           <a 
             href="/contact" 
-            className="inline-flex items-center gap-2 px-8 py-3 bg-[#6B8E6E] text-white rounded-full hover:bg-[#89B890] transition-colors font-medium"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-[#344c3d] text-white rounded-md hover:bg-[#344c3d]/90 transition-colors font-medium"
           >
             Contact Support
           </a>
-        </motion.div>
+        </div>
       </div>
     </div>
   );

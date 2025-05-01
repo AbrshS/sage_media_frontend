@@ -40,8 +40,8 @@ export default function About() {
               }}
               className={`w-2 h-2 rounded-full transition-all duration-300 ${
                 activeSection === index 
-                  ? 'bg-emerald-700 w-3 h-3' 
-                  : 'bg-emerald-200 hover:bg-emerald-300'
+                  ? 'bg-[#344c3d] w-3 h-3' 
+                  : 'bg-[#344c3d]/20 hover:bg-[#344c3d]/30'
               }`}
               aria-label={`Navigate to ${_} section`}
             />
@@ -63,7 +63,7 @@ export default function About() {
               className="w-full h-full object-cover"
             />
           </div>
-          <div className="absolute inset-0 bg-gradient-to-r from-emerald-950/90 to-emerald-950/80" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#344c3d]/90 to-[#344c3d]/80" />
         </div>
         
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 ">
@@ -82,7 +82,7 @@ export default function About() {
             </p>
             
             <div className="flex flex-wrap gap-4">
-              <button className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition-colors font-medium">
+              <button className="inline-flex items-center gap-2 px-6 py-3 bg-[#344c3d] text-white rounded-md hover:bg-[#344c3d]/90 transition-colors font-medium">
                 <span>Our Journey</span>
                 <ChevronRight className="w-4 h-4" />
               </button>
@@ -117,7 +117,7 @@ export default function About() {
             </div>
             
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-emerald-50 text-emerald-700 mb-4">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-[#344c3d]/10 text-[#344c3d] mb-4">
                 <span className="text-sm font-medium">About Us</span>
               </div>
               
@@ -125,7 +125,7 @@ export default function About() {
                 Our Journey Since 2018
               </h2>
               
-              <div className="h-1 w-16 bg-emerald-600 mb-6"></div>
+              <div className="h-1 w-16 bg-[#344c3d] mb-6"></div>
               
               <p className="text-gray-700 leading-relaxed mb-4">
                 Founded in 2018, Sage Media began with a simple mission: to showcase the beauty and talent of African models to the world. What started as a small platform has grown into a global movement.
@@ -137,8 +137,8 @@ export default function About() {
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center mt-1">
-                    <Globe className="w-5 h-5 text-emerald-600" />
+                  <div className="w-10 h-10 rounded-full bg-[#344c3d]/10 flex items-center justify-center mt-1">
+                    <Globe className="w-5 h-5 text-[#344c3d]" />
                   </div>
                   <div>
                     <h4 className="text-gray-900 font-semibold mb-1">Global Reach</h4>
@@ -147,8 +147,8 @@ export default function About() {
                 </div>
                 
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center mt-1">
-                    <Shield className="w-5 h-5 text-emerald-600" />
+                  <div className="w-10 h-10 rounded-full bg-[#344c3d]/10 flex items-center justify-center mt-1">
+                    <Shield className="w-5 h-5 text-[#344c3d]" />
                   </div>
                   <div>
                     <h4 className="text-gray-900 font-semibold mb-1">Integrity</h4>
@@ -175,7 +175,7 @@ export default function About() {
                 key={index}
                 className="bg-white p-6 rounded-lg shadow-sm"
               >
-                <h3 className="text-3xl font-bold text-emerald-700 mb-2">
+                <h3 className="text-3xl font-bold text-[#344c3d] mb-2">
                   {stat.number}
                 </h3>
                 <p className="text-gray-600">{stat.label}</p>
@@ -192,7 +192,7 @@ export default function About() {
       >
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12 max-w-3xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-emerald-50 text-emerald-700 mb-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-[#344c3d]/10 text-[#344c3d] mb-4">
               <span className="text-sm font-medium">Our Mission</span>
             </div>
             
@@ -200,7 +200,7 @@ export default function About() {
               Creating Opportunities Through Innovation
             </h2>
             
-            <div className="h-1 w-16 bg-emerald-600 mx-auto mb-6"></div>
+            <div className="h-1 w-16 bg-[#344c3d] mx-auto mb-6"></div>
             
             <p className="text-gray-700">
               We're committed to transforming the modeling industry by creating platforms that showcase African talent and connect them with global opportunities.
@@ -229,8 +229,8 @@ export default function About() {
                 key={index}
                 className="bg-white border border-gray-100 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow duration-300"
               >
-                <div className="w-12 h-12 rounded-lg bg-emerald-100 flex items-center justify-center mb-4">
-                  <item.icon className="w-6 h-6 text-emerald-600" />
+                <div className="w-12 h-12 rounded-lg bg-[#344c3d]/10 flex items-center justify-center mb-4">
+                  <item.icon className="w-6 h-6 text-[#344c3d]" />
                 </div>
                 
                 <h3 className="text-xl font-semibold text-gray-900 mb-3">
@@ -251,7 +251,7 @@ export default function About() {
       >
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12 max-w-3xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-emerald-50 text-emerald-700 mb-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-[#344c3d]/10 text-[#344c3d] mb-4">
               <span className="text-sm font-medium">Our Team</span>
             </div>
             
@@ -259,7 +259,7 @@ export default function About() {
               The Visionaries Behind Our Success
             </h2>
             
-            <div className="h-1 w-16 bg-emerald-600 mx-auto mb-6"></div>
+            <div className="h-1 w-16 bg-[#344c3d] mx-auto mb-6"></div>
             
             <p className="text-gray-700">
               Meet the dedicated team working tirelessly to transform the modeling industry and create opportunities for African talent.
@@ -301,7 +301,7 @@ export default function About() {
                 </div>
                 <div className="p-6">
                   <h3 className="text-xl font-semibold text-gray-900 mb-1">{member.name}</h3>
-                  <p className="text-emerald-600">{member.role}</p>
+                  <p className="text-[#344c3d]">{member.role}</p>
                 </div>
               </div>
             ))}
@@ -317,7 +317,7 @@ export default function About() {
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-emerald-50 text-emerald-700 mb-4">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-[#344c3d]/10 text-[#344c3d] mb-4">
                 <span className="text-sm font-medium">Our Values</span>
               </div>
               
@@ -325,7 +325,7 @@ export default function About() {
                 Principles That Guide Us
               </h2>
               
-              <div className="h-1 w-16 bg-emerald-600 mb-6"></div>
+              <div className="h-1 w-16 bg-[#344c3d] mb-6"></div>
               
               <div className="space-y-6">
                 {[
@@ -339,7 +339,7 @@ export default function About() {
                     className="flex gap-4"
                   >
                     <div className="mt-1">
-                      <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 font-semibold">
+                      <div className="w-8 h-8 rounded-full bg-[#344c3d]/10 flex items-center justify-center text-[#344c3d] font-semibold">
                         {index + 1}
                       </div>
                     </div>
@@ -409,7 +409,7 @@ export default function About() {
       </section>
 
       {/* CTA Section - Simple and Elegant */}
-      <section className="py-16 px-4 bg-emerald-900 text-white">
+      <section className="py-16 px-4 bg-[#344c3d] text-white">
         <div className="max-w-6xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Join the Movement?</h2>
           <p className="text-white/80 max-w-2xl mx-auto mb-8">
@@ -417,7 +417,7 @@ export default function About() {
             we invite you to be part of our growing community.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <button className="px-6 py-3 bg-white text-emerald-900 rounded-md hover:bg-gray-100 transition-colors font-medium">
+            <button className="px-6 py-3 bg-white text-[#344c3d] rounded-md hover:bg-gray-100 transition-colors font-medium">
               Apply as Model
             </button>
             <button className="px-6 py-3 bg-transparent border border-white/30 text-white rounded-md hover:bg-white/10 transition-colors font-medium">
