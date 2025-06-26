@@ -84,13 +84,6 @@ export default function FAQ() {
   ];
 
   // Filter questions based on search query
-  const filteredCategories = faqCategories.map(category => ({
-    ...category,
-    questions: category.questions.filter(faq => 
-      faq.q.toLowerCase().includes(searchQuery.toLowerCase()) || 
-      faq.a.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-  })).filter(category => category.questions.length > 0);
 
   return (
     <div className="min-h-screen bg-white py-24">

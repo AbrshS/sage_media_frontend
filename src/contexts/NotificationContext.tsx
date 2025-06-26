@@ -20,7 +20,7 @@ const NotificationContext = createContext<NotificationContextType | undefined>(u
 export function NotificationProvider({ children }: { children: React.ReactNode }) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error] = useState<string | null>(null);
 
   const fetchNotifications = async () => {
     try {
@@ -58,7 +58,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     fetchNotifications();
   }, []);
 
-  const markAsViewed = (notification: Notification) => {
+  const markAsViewed = () => {
     localStorage.setItem('lastNotificationViewed', new Date().toISOString());
     setNotifications([]);
   };

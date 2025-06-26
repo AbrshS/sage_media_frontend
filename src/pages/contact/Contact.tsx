@@ -11,7 +11,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import axios from 'axios';
 
 export default function Contact() {
   // All state and handlers remain unchanged
@@ -26,7 +25,6 @@ export default function Contact() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -48,10 +46,9 @@ export default function Contact() {
     e.preventDefault();
     setLoading(true);
     setError('');
-    setSuccess('');
+  
 
     try {
-      const response = await axios.post('http://localhost:3000/api/contact', formData);
       setShowSuccessDialog(true);
       setFormData({
         firstName: '',

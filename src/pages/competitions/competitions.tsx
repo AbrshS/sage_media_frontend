@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import {  useState } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, Users, Trophy, Clock, DollarSign, Camera } from 'lucide-react';
+import { Calendar, Users, Clock, DollarSign } from 'lucide-react';
 import { format } from 'date-fns';
 import CompetitionSection from '../../components/CompetitionSection';
 
@@ -31,9 +30,8 @@ interface Competition {
 }
 
 const Competitions = () => {
-  const location = useLocation();
   const [openApplication, setOpenApplication] = useState<string | null>(null);
-  const [competitions, setCompetitions] = useState<Competition[]>([]);
+  const [competitions] = useState<Competition[]>([]);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   const getStatusColor = (status: string) => {

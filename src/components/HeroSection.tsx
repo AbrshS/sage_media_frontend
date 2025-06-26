@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Clock, Star, Crown, Sparkles, ChevronDown, Instagram, Camera, Award, Users, Globe, Facebook, Twitter as TwitterIcon } from "lucide-react";
+import { ArrowRight, Clock, Star, Crown,  ChevronDown, Instagram, Camera, Award, Users, Globe, Facebook, Twitter as TwitterIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export default function HeroSection() {

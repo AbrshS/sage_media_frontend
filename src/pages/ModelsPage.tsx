@@ -1,5 +1,4 @@
 import  { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Search, Filter, Star, CheckCircle, TrendingUp, MapPin, Instagram, ChevronDown } from 'lucide-react';
 

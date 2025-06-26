@@ -4,11 +4,10 @@ import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { 
   User, Mail, Phone, MapPin, Calendar, Camera, Link, Instagram, 
-  Facebook, Twitter, Upload, X, AlertCircle, Globe, Briefcase 
+  Facebook, Twitter, X, AlertCircle, Globe, Briefcase 
 } from "lucide-react"
 import axios from "axios"
 import { toast } from "react-hot-toast"
-import { useNavigate } from "react-router-dom"
 
 // Constants
 const API_BASE_URL = "http://localhost:3000";
@@ -75,7 +74,6 @@ export default function CompetitionApplicationForm({
   const [userIP, setUserIP] = useState<string>('');
   const totalSteps = 4;
 
-  const navigate = useNavigate();
 
   // Add the IP and application check effect
   useEffect(() => {
@@ -135,7 +133,7 @@ export default function CompetitionApplicationForm({
       setFormData(prev => ({
         ...prev,
         [parent]: {
-          ...prev[parent as keyof typeof prev],
+          ...(prev[parent as keyof typeof prev] as Record<string, any>),
           [child]: value
         }
       }));

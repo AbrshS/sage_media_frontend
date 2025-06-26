@@ -1,42 +1,25 @@
 import { useState, useEffect, useRef } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { Link, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Bell, Menu, X, User, LogOut } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import {  Menu, X, User, LogOut } from "lucide-react";
 import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
-import { Info, XCircle } from "lucide-react";
+
+interface ModelUser {
+  id: string;
+  name: string;
+  profileImage?: string;
+}
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [modelUser, setModelUser] = useState<null | {id: string, name: string, profileImage?: string}>(null);
+  const [modelUser, setModelUser] = useState<ModelUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [, setActiveSection] = useState<string>("");
   const headerRef = useRef<HTMLElement>(null);
   
   const navigate = useNavigate();
-  const location = useLocation();
-  const { scrollY } = useScroll();
   
-  // Transform values for header appearance
-  const headerOpacity = useTransform(
-    scrollY, 
-    [0, 100, 200], 
-    [0, 0.8, 0.95]
-  );
-  
-  const headerBackdrop = useTransform(
-    scrollY,
-    [0, 100, 200],
-    ["blur(0px)", "blur(8px)", "blur(10px)"]
-  );
-  
-  const headerShadow = useTransform(
-    scrollY,
-    [0, 100],
-    ["0 0 0 rgba(0,0,0,0)", "0 4px 20px rgba(58, 75, 60, 0.1)"]
-  );
 
   // Check if user is logged in
   // Add this function at the top of your component
@@ -55,9 +38,11 @@ export default function Header() {
       if (token && userId) {
         setModelUser({ 
           id: userId, 
-          name: localStorage.getItem('userName') || 'User'
+          name: localStorage.getItem('userName') || 'User',
+          profileImage: localStorage.getItem('userProfileImage') || undefined
         });
-      } else {
+      }
+      else {
         setModelUser(null);
       }
       setLoading(false);
@@ -92,7 +77,7 @@ export default function Header() {
     localStorage.removeItem('modelToken');
     localStorage.removeItem('userId');
     localStorage.removeItem('userName');
-    setModelUser(null);
+    setModelUser(null); 
     navigate('/');
   };
 
@@ -139,6 +124,22 @@ export default function Header() {
             ) : isAuthenticated() ? (
               <div className="flex items-center space-x-2">
                 <NotificationDropdown />
+                {modelUser && (
+                  <div className="flex items-center space-x-2">
+                    {modelUser.profileImage ? (
+                      <img 
+                        src={modelUser.profileImage} 
+                        alt={modelUser.name} 
+                        className="w-8 h-8 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-[#3a4b3c] text-white flex items-center justify-center">
+                        {modelUser.name.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    <span className="text-[#3a4b3c] font-medium">{modelUser.name}</span>
+                  </div>
+                )}
                 <Button 
                   variant="ghost" 
                   size="icon"
@@ -242,6 +243,22 @@ export default function Header() {
               ) : isAuthenticated() ? (
                 <div className="flex flex-col space-y-3">
                   <NotificationDropdown />
+                  {modelUser && (
+                    <div className="flex items-center space-x-2 px-2">
+                      {modelUser.profileImage ? (
+                        <img 
+                          src={modelUser.profileImage} 
+                          alt={modelUser.name} 
+                          className="w-8 h-8 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-[#3a4b3c] text-white flex items-center justify-center">
+                          {modelUser.name.charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                      <span className="text-[#3a4b3c] font-medium">{modelUser.name}</span>
+                    </div>
+                  )}
                   <Button 
                     variant="ghost" 
                     className="justify-start text-[#3a4b3c] hover:text-[#6cbc8b] hover:bg-white/20"

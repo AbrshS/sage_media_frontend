@@ -126,30 +126,6 @@ export default function HowItWorks() {
         </motion.div>
       </div>
       
-      {/* Add the required animations to the global CSS */}
-      <style jsx global>{`
-        @keyframes float-slow {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-15px); }
-        }
-        @keyframes float-medium {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-10px); }
-        }
-        @keyframes float-fast {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-5px); }
-        }
-        .animate-float-slow {
-          animation: float-slow 7s ease-in-out infinite;
-        }
-        .animate-float-medium {
-          animation: float-medium 5s ease-in-out infinite;
-        }
-        .animate-float-fast {
-          animation: float-fast 3s ease-in-out infinite;
-        }
-      `}</style>
     </section>
   );
 }

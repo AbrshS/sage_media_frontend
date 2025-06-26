@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Award, ChevronRight, Globe, Shield, Users } from 'lucide-react';
+import {  ChevronRight, Globe, Shield, Users } from 'lucide-react';
 
 export default function About() {
   const [activeSection, setActiveSection] = useState(0);
@@ -51,10 +51,10 @@ export default function About() {
 
       {/* Hero Section - Simple and Elegant */}
       <section 
-        ref={el => sectionRefs.current[0] = el}
+        ref={(el: HTMLDivElement | null) => sectionRefs.current[0] = el}
         className="relative min-h-[90vh] flex items-center"
       >
-        <div className="absolute inset-0 ">
+        <div className="absolute inset-0">
           {/* Simple overlay */}
           <div className="absolute inset-0 opacity-30">
             <img 
@@ -97,7 +97,7 @@ export default function About() {
 
       {/* About Section - Clean and Simple */}
       <section 
-        ref={el => sectionRefs.current[1] = el}
+        ref={(el: HTMLDivElement | null) => sectionRefs.current[1] = el}
         className="py-20 px-4 bg-white"
       >
         <div className="max-w-6xl mx-auto">
@@ -187,7 +187,7 @@ export default function About() {
 
       {/* Mission Section - Simple Cards */}
       <section 
-        ref={el => sectionRefs.current[2] = el}
+        ref={(el: HTMLDivElement | null) => sectionRefs.current[2] = el}
         className="py-20 px-4 bg-white"
       >
         <div className="max-w-6xl mx-auto">
@@ -246,7 +246,7 @@ export default function About() {
 
       {/* Team Section - Simple and Elegant */}
       <section 
-        ref={el => sectionRefs.current[3] = el}
+        ref={(el: HTMLDivElement | null) => sectionRefs.current[3] = el}
         className="py-20 px-4 bg-gray-50"
       >
         <div className="max-w-6xl mx-auto">
@@ -311,7 +311,7 @@ export default function About() {
 
       {/* Values Section - Simple and Clean */}
       <section 
-        ref={el => sectionRefs.current[4] = el}
+        ref={(el: HTMLDivElement | null) => sectionRefs.current[4] = el}
         className="py-20 px-4 bg-white"
       >
         <div className="max-w-6xl mx-auto">

@@ -1,8 +1,8 @@
 "use client"
 
 import { useEffect, useState, useCallback, useRef } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { AlertCircle, Calendar, Clock, Award, ArrowRight, Sparkles, TrendingUp, Users, DollarSign, Search, Filter, ChevronDown, X } from "lucide-react"
+import { motion } from "framer-motion"
+import { AlertCircle, Calendar, Clock, Award, ArrowRight, Sparkles, TrendingUp, Search, Filter, ChevronDown, X } from "lucide-react"
 import { format } from 'date-fns'
 import { toast } from "react-hot-toast"
 import { useNavigate } from "react-router-dom"

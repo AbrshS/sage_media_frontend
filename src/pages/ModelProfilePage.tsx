@@ -1,6 +1,4 @@
-import Header from '@/components/Header';
-import  { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import OverviewTab from '@/components/profile/OverviewTab';
 import PortfolioTab from '@/components/profile/PortfolioTab';
 import AnalysisTab from '@/components/profile/AnalysisTab';
@@ -10,13 +8,14 @@ import { Fragment } from 'react';
 import SocialMediaBadges from '../components/SocialMediaBadges';
 import ForgotPassword from '@/components/auth/ForgotPassword';
 import { Loader2 } from 'lucide-react';
+import { useParams, useNavigate } from 'react-router-dom';
 
 
 // Inside your ModelProfilePage component
 const ModelProfilePage = () => {
   const { id } = useParams(); // Get the model ID from URL params
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab] = useState('overview');
   const [loading, setLoading] = useState(true);
   const [activitiesLoading, setActivitiesLoading] = useState(true);
   
@@ -78,7 +77,6 @@ const ModelProfilePage = () => {
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
   const [activities, setActivities] = useState<Activity[]>([]);
   const [userLoading, setUserLoading] = useState(true);
-  const [uploadLoading] = useState(false);
   const [isImageDialogOpen, setIsImageDialogOpen] = useState(false); // Add this missing state
   const [isOwnProfile, setIsOwnProfile] = useState(!id); // If no ID, it's the user's own profile
   
@@ -508,7 +506,7 @@ const ModelProfilePage = () => {
     }
   };
 
-  function handleTabChange(arg0: string): void {
+  function handleTabChange(_arg0: string): void {
     throw new Error('Function not implemented.');
   }
 
