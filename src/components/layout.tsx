@@ -1,6 +1,5 @@
 import { ReactNode, useEffect } from "react";
 import Header from "./Header";
-
 import MotionBackground from "./MotionBackground";
 
 interface LayoutProps {
@@ -28,7 +27,6 @@ export default function Layout({ children }: LayoutProps) {
       <main className="flex-grow">
         {children}
       </main>
-    
     </div>
   );
 }
